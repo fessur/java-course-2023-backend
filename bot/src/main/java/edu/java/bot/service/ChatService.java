@@ -15,12 +15,12 @@ public class ChatService {
         this.chatRepository = chatRepository;
     }
 
-    public void register(Update update) {
-        Chat chat = new Chat(update.message().chat().id(), new ArrayList<>());
+    public void register(long id) {
+        Chat chat = new Chat(id, new ArrayList<>());
         chatRepository.save(chat);
     }
 
-    public Optional<Chat> find(Update update) {
-        return chatRepository.findById(update.message().chat().id());
+    public Optional<Chat> find(long id) {
+        return chatRepository.findById(id);
     }
 }

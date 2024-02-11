@@ -27,9 +27,9 @@ public class StartCommand extends Command {
 
     @Override
     public SendMessage process(Update update) {
-        Optional<Chat> optionalChat = chatService.find(update);
+        Optional<Chat> optionalChat = chatService.find(update.message().chat().id());
         if (optionalChat.isEmpty()) {
-            chatService.register(update);
+            chatService.register(update.message().chat().id());
             return new SendMessage(update.message().chat().id(), "Hello! Welcome to our bot!");
         }
         return new SendMessage(update.message().chat().id(),
