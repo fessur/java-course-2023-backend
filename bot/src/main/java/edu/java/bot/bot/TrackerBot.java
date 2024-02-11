@@ -42,6 +42,9 @@ public class TrackerBot extends TelegramBot {
     }
 
     private void processUnrecognizedCommand(Update update) {
-        execute(new SendMessage(update.message().chat().id(), "Данная команда не поддерживается!"));
+        if (update.message() != null) {
+            execute(new SendMessage(update.message().chat().id(),
+                "This command is not supported.\nUse /help to see a list of all possible commands."));
+        }
     }
 }
