@@ -1,6 +1,5 @@
 package edu.java.bot.service;
 
-import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.domain.Link;
 import edu.java.bot.repository.LinkRepository;
 import org.springframework.stereotype.Service;

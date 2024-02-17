@@ -8,7 +8,7 @@ import java.util.List;
 
 @Component
 public class HelpCommand extends Command {
-    List<Command> commands;
+    private final List<Command> commands;
 
     public HelpCommand(List<Command> commands) {
         this.commands = commands;
