@@ -5,8 +5,8 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.domain.Link;
 import edu.java.bot.service.LinkService;
 import edu.java.bot.util.CommonUtils;
-import org.springframework.stereotype.Component;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ListCommand extends Command {

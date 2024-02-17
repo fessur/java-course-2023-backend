@@ -4,8 +4,8 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.domain.Chat;
 import edu.java.bot.service.ChatService;
-import org.springframework.stereotype.Component;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class StartCommand extends Command {

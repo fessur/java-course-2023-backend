@@ -9,8 +9,8 @@ import com.pengrad.telegrambot.request.SetMyCommands;
 import edu.java.bot.configuration.ApplicationConfig;
 import edu.java.bot.service.command.Command;
 import jakarta.annotation.PostConstruct;
-import org.springframework.stereotype.Component;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TrackerBot extends TelegramBot {
@@ -43,8 +43,10 @@ public class TrackerBot extends TelegramBot {
 
     private void processUnrecognizedCommand(Update update) {
         if (update.message() != null) {
-            execute(new SendMessage(update.message().chat().id(),
-                "This command is not supported.\nUse /help to see a list of all possible commands."));
+            execute(new SendMessage(
+                update.message().chat().id(),
+                "This command is not supported.\nUse /help to see a list of all possible commands."
+            ));
         }
     }
 }

@@ -14,6 +14,7 @@ public class UntrackCommandTest extends LinksCommandsBaseTest {
     private UntrackCommand untrackCommand;
     private static final String UNTRACK_EMPTY_MSG = "You are not tracking this link yet.";
     private static final String DESCRIPTION = "Stop tracking a link";
+
     @BeforeEach
     public void setUp() {
         untrackCommand = new UntrackCommand(linkService);

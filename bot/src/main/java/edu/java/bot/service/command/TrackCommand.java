@@ -5,10 +5,10 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.domain.Link;
 import edu.java.bot.service.LinkService;
 import edu.java.bot.util.CommonUtils;
-import org.springframework.stereotype.Component;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TrackCommand extends Command {
@@ -34,8 +34,8 @@ public class TrackCommand extends Command {
             Link link = Link.parse(CommonUtils.cutFirstWord(update.message().text()));
             if (!linkService.isSupported(link)) {
                 return new SendMessage(update.message().chat().id(),
-                    "This domain is not supported yet. List of all supported domains:\n" +
-                        CommonUtils.joinEnumerated(linkService.getSupportedDomains(), 1));
+                    "This domain is not supported yet. List of all supported domains:\n"
+                        + CommonUtils.joinEnumerated(linkService.getSupportedDomains(), 1));
             }
             Optional<Link> optionalLink = linkService.find(update.message().chat().id(), link.getUrl());
             if (optionalLink.isPresent()) {

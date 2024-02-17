@@ -7,14 +7,14 @@ import edu.java.bot.TestUtils;
 import edu.java.bot.UpdateMock;
 import edu.java.bot.service.command.Command;
 import edu.java.bot.service.command.HelpCommand;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 

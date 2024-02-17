@@ -5,10 +5,10 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.domain.Link;
 import edu.java.bot.service.LinkService;
 import edu.java.bot.util.CommonUtils;
-import org.springframework.stereotype.Component;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UntrackCommand extends Command {
@@ -37,8 +37,12 @@ public class UntrackCommand extends Command {
                 return new SendMessage(update.message().chat().id(), "You are not tracking this link yet.");
             }
             linkService.deleteLink(update.message().chat().id(), link);
-            return new SendMessage(update.message().chat().id(), "Link " + link.getUrl() + " is no longer being tracked.");
+            return new SendMessage(
+                update.message().chat().id(),
+                "Link " + link.getUrl() + " is no longer being tracked."
+            );
         } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
             return new SendMessage(update.message().chat().id(), "The link is not correct.");
-        }    }
+        }
+    }
 }

@@ -4,10 +4,10 @@ import edu.java.bot.configuration.ApplicationConfig;
 import edu.java.bot.domain.Chat;
 import edu.java.bot.domain.Link;
 import edu.java.bot.exception.DBException;
-import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 @Component
 public class LinkRepository extends BaseRepository {
@@ -22,7 +22,7 @@ public class LinkRepository extends BaseRepository {
             chat.addLink(link);
             writeDatabase(chats);
         } catch (IOException e) {
-            throw new DBException("Unable to load database.", e);
+            throw new DBException(ERROR_MESSAGE, e);
         }
     }
 
@@ -32,7 +32,7 @@ public class LinkRepository extends BaseRepository {
             Chat chat = findChat(chats, chatId);
             return chat.getLinks();
         } catch (IOException e) {
-            throw new DBException("Unable to load database.", e);
+            throw new DBException(ERROR_MESSAGE, e);
         }
     }
 
@@ -44,7 +44,8 @@ public class LinkRepository extends BaseRepository {
             writeDatabase(chats);
         } catch (IOException e) {
             throw new DBException("Unable to load database.", e);
-        }    }
+        }
+    }
 
     public Optional<Link> find(long chatId, String url) {
         List<Link> links = findAll(chatId);

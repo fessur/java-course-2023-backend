@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import edu.java.bot.configuration.ApplicationConfig;
 import edu.java.bot.domain.Chat;
-import edu.java.bot.exception.DBException;
 import edu.java.bot.exception.NoSuchChatException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -18,6 +17,7 @@ import java.util.Optional;
 public abstract class BaseRepository {
     private final Gson gson = new Gson();
     private final String databasePath;
+    protected static final String ERROR_MESSAGE = "Unable to load database.";
 
     public BaseRepository(ApplicationConfig applicationConfig) {
         this.databasePath = applicationConfig.localDbPath();

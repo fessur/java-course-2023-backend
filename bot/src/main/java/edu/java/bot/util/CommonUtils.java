@@ -6,8 +6,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class CommonUtils {
+public final class CommonUtils {
+    private CommonUtils() {
+    }
+
     private static final Pattern PATTERN = Pattern.compile("\\s");
+
     public static <T> String joinEnumerated(List<T> list, int startNumber) {
         return IntStream.range(0, list.size())
             .mapToObj(index -> (index + startNumber) + ". " + list.get(index).toString())

@@ -7,13 +7,13 @@ import edu.java.bot.TestUtils;
 import edu.java.bot.UpdateMock;
 import edu.java.bot.service.ChatService;
 import edu.java.bot.service.command.StartCommand;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.List;
-import java.util.Optional;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 

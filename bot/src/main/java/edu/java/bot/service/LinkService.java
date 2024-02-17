@@ -2,9 +2,9 @@ package edu.java.bot.service;
 
 import edu.java.bot.domain.Link;
 import edu.java.bot.repository.LinkRepository;
-import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 public class LinkService {
@@ -18,6 +18,7 @@ public class LinkService {
     public List<String> getSupportedDomains() {
         return supportedDomains;
     }
+
     public boolean isSupported(Link link) {
         return supportedDomains.contains(link.getDomain());
     }

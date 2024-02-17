@@ -6,16 +6,17 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.TestUtils;
 import edu.java.bot.UpdateMock;
 import edu.java.bot.service.command.TrackCommand;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TrackCommandTest extends LinksCommandsBaseTest {
     private TrackCommand trackCommand;
     private static final String DESCRIPTION = "Start tracking a link";
     private static final String TRACK_TWICE_MSG = "You are already tracking this link.";
+
     @BeforeEach
     public void setUp() {
         trackCommand = new TrackCommand(linkService);

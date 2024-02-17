@@ -2,7 +2,6 @@ package edu.java.bot.exception;
 
 public class DBException extends RuntimeException {
     public DBException() {
-        super();
     }
 
     public DBException(String message) {

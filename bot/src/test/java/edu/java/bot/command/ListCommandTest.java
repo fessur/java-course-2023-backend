@@ -7,9 +7,9 @@ import edu.java.bot.TestUtils;
 import edu.java.bot.UpdateMock;
 import edu.java.bot.service.command.ListCommand;
 import edu.java.bot.util.CommonUtils;
+import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.Arrays;
 import static org.assertj.core.api.Assertions.*;
 
 public class ListCommandTest extends LinksCommandsBaseTest {

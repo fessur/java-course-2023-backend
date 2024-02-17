@@ -1,11 +1,10 @@
 package edu.java.bot.service;
 
-import com.pengrad.telegrambot.model.Update;
 import edu.java.bot.domain.Chat;
 import edu.java.bot.repository.ChatRepository;
-import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ChatService {
