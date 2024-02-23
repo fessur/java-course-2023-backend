@@ -2,6 +2,7 @@ package edu.java.bot;
 
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.domain.Link;
+import edu.java.bot.util.CommonUtils;
 import static org.assertj.core.api.Assertions.*;
 
 public class TestUtils {
@@ -12,7 +13,7 @@ public class TestUtils {
 
     public static Link parseLink(String link) {
         try {
-            return Link.parse(link);
+            return CommonUtils.parse(link);
         } catch (Exception ignored) {
             // no-operations.
         }

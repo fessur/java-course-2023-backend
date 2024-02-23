@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import edu.java.bot.util.CommonUtils;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -41,7 +42,7 @@ public class LinksCommandsBaseTest {
 
     protected void setTracked(long chatId, String link) {
         try {
-            lenient().when(linkService.find(chatId, link)).thenReturn(Optional.of(Link.parse(link)));
+            lenient().when(linkService.find(chatId, link)).thenReturn(Optional.of(CommonUtils.parse(link)));
         } catch (Exception ignored) {
             // no-operations.
         }
