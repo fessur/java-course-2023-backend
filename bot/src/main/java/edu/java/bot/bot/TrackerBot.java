@@ -10,6 +10,7 @@ import edu.java.bot.configuration.ApplicationConfig;
 import edu.java.bot.service.command.Command;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,11 +43,9 @@ public class TrackerBot extends TelegramBot {
     }
 
     private void processUnrecognizedCommand(Update update) {
-        if (update.message() != null) {
-            execute(new SendMessage(
-                update.message().chat().id(),
-                "This command is not supported.\nUse /help to see a list of all possible commands."
-            ));
-        }
+        Optional.ofNullable(update.message()).ifPresent(message -> execute(new SendMessage(
+            message.chat().id(),
+            "This command is not supported.\nUse /help to see a list of all possible commands."
+        )));
     }
 }

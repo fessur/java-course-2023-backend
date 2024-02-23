@@ -31,7 +31,7 @@ public class UntrackCommand extends Command {
     @Override
     public SendMessage process(Update update) {
         try {
-            Link link = Link.parse(CommonUtils.cutFirstWord(update.message().text()));
+            Link link = CommonUtils.parse(CommonUtils.cutFirstWord(update.message().text()));
             Optional<Link> optionalLink = linkService.find(update.message().chat().id(), link.getUrl());
             if (optionalLink.isEmpty()) {
                 return new SendMessage(update.message().chat().id(), "You are not tracking this link yet.");

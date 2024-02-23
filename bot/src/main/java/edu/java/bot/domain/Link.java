@@ -1,10 +1,5 @@
 package edu.java.bot.domain;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
 public class Link {
     // todo: добавить нормальную БД с many to many между Link и Chat
     private String domain;
@@ -29,11 +24,6 @@ public class Link {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public static Link parse(String url) throws URISyntaxException, MalformedURLException {
-        URL parsed = new URI(url).toURL();
-        return new Link(parsed.getHost(), url);
     }
 
     @Override

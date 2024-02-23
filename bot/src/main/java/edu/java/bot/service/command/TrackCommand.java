@@ -31,7 +31,7 @@ public class TrackCommand extends Command {
     @Override
     public SendMessage process(Update update) {
         try {
-            Link link = Link.parse(CommonUtils.cutFirstWord(update.message().text()));
+            Link link = CommonUtils.parse(CommonUtils.cutFirstWord(update.message().text()));
             if (!linkService.isSupported(link)) {
                 return new SendMessage(update.message().chat().id(),
                     "This domain is not supported yet. List of all supported domains:\n"

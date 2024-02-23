@@ -1,5 +1,10 @@
 package edu.java.bot.util;
 
+import edu.java.bot.domain.Link;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,5 +30,10 @@ public final class CommonUtils {
             return trimmedText.substring(matcher.start() + 1);
         }
         return "";
+    }
+
+    public static Link parse(String url) throws URISyntaxException, MalformedURLException {
+        URL parsed = new URI(url).toURL();
+        return new Link(parsed.getHost(), url);
     }
 }
