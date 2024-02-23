@@ -150,7 +150,7 @@ public class GithubClientTest {
                 GithubRepositoryResponse::lastActivityDate
             )
             .containsExactly(
-                2325298,
+                2325298L,
                 String.format("%s/%s", owner, repository),
                 OffsetDateTime.parse("2024-02-23T15:30:57Z")
             );
