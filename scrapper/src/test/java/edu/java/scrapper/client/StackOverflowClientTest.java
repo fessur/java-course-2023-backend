@@ -1,10 +1,10 @@
 package edu.java.scrapper.client;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import edu.java.client.ClientConfiguration;
 import edu.java.client.StackOverflowClient;
 import edu.java.client.dto.StackOverflowPostInnerResponse;
 import edu.java.client.dto.StackOverflowPostResponse;
+import edu.java.client.implementation.StackOverflowClientImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
@@ -18,7 +18,7 @@ public class StackOverflowClientTest {
 
     @BeforeEach
     public void setUp() {
-        stackOverflowClient = new ClientConfiguration().stackOverflowClient("http://localhost:8082");
+        stackOverflowClient = new StackOverflowClientImpl("http://localhost:8082");
     }
 
     @Test
@@ -58,18 +58,21 @@ public class StackOverflowClientTest {
                       "quota_remaining": 9926
                     }""")));
 
-        StackOverflowPostResponse response = stackOverflowClient.fetchPost(postId).block();
+        StackOverflowPostResponse response = stackOverflowClient.fetchPost(postId);
 
         assertThat(response)
             .isNotNull()
             .extracting(
-            StackOverflowPostResponse::getId,
-            StackOverflowPostInnerResponse::getTitle,
-            StackOverflowPostInnerResponse::getLastActivityDate
-        ).containsExactly(
-            postId,
-                "Why does HTML think “chucknorris” is a color?",
-                OffsetDateTime.parse("2024-01-24T02:40:12Z"));
+                resp -> resp.items().getFirst())
+            .extracting(
+                StackOverflowPostInnerResponse::id,
+                StackOverflowPostInnerResponse::title,
+                StackOverflowPostInnerResponse::lastActivityDate
+            )
+            .containsExactly(
+                postId,
+                    "Why does HTML think “chucknorris” is a color?",
+                    OffsetDateTime.parse("2024-01-24T02:40:12Z"));
 
     }
 }
