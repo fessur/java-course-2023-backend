@@ -5,7 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 @Slf4j
 public class LinkUpdaterScheduler {
-    @Scheduled(fixedDelayString = "#{scheduler.forceCheckDelay}")
+    @Scheduled(fixedDelayString = "#{scheduler.interval}")
     public void update() {
         log.info("Updating...");
     }
