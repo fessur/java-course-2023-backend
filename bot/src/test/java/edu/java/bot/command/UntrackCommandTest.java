@@ -12,42 +12,40 @@ import static org.assertj.core.api.Assertions.*;
 
 public class UntrackCommandTest extends LinksCommandsBaseTest {
     private UntrackCommand untrackCommand;
-    private static final String UNTRACK_EMPTY_MSG = "You are not tracking this link yet.";
+    private static final String UNTRACK_EMPTY_MSG = "You are not tracking this link yet";
     private static final String DESCRIPTION = "Stop tracking a link";
 
     @BeforeEach
     public void setUp() {
-        untrackCommand = new UntrackCommand(linkService);
+        untrackCommand = new UntrackCommand(scrapperClient);
     }
 
     @Test
     public void testEmpty() {
-        Update update = new UpdateMock().withChat().withMessage("/untrack " + LINKS.get(0)).build();
-        setUntracked(update.message().chat().id(), LINKS.get(0));
+        Update update = new UpdateMock().withChat().withMessage("/untrack " + LINKS.getFirst()).build();
+        setNotTrackingYetResponse(update.message().chat().id(), LINKS.getFirst());
         SendMessage sendMessage = untrackCommand.process(update);
         TestUtils.checkMessage(sendMessage, UNTRACK_EMPTY_MSG);
     }
 
     @Test
     public void testOneMessage() {
-        setAllSupported();
-        Update update = new UpdateMock().withChat().withMessage("/untrack " + LINKS.get(0)).build();
+        Update update = new UpdateMock().withChat().withMessage("/untrack " + LINKS.getFirst()).build();
         final long chatId = update.message().chat().id();
-        setAllTracked(chatId, LINKS.get(0));
+        setTrackingResponse(chatId, LINKS.getFirst());
         SendMessage sendMessage = untrackCommand.process(update);
-        TestUtils.checkMessage(sendMessage, generateUntrackedMessage(LINKS.get(0)));
+        TestUtils.checkMessage(sendMessage, generateUntrackedMessage(LINKS.getFirst()));
     }
 
     @Test
     public void testTwoMessages() {
-        setAllSupported();
-        Update update1 = new UpdateMock().withChat().withMessage("/untrack " + LINKS.get(0)).build();
+        Update update1 = new UpdateMock().withChat().withMessage("/untrack " + LINKS.getFirst()).build();
         final long chatId = update1.message().chat().id();
-        setAllTracked(chatId, LINKS.get(0), LINKS.get(1));
+        setTrackingResponse(chatId, LINKS.getFirst());
         SendMessage sendMessage1 = untrackCommand.process(update1);
-        TestUtils.checkMessage(sendMessage1, generateUntrackedMessage(LINKS.get(0)));
-        setAllTracked(chatId, LINKS.get(1));
+        TestUtils.checkMessage(sendMessage1, generateUntrackedMessage(LINKS.getFirst()));
 
+        setTrackingResponse(chatId, LINKS.get(1));
         Update update2 = new UpdateMock().withChat(chatId).withMessage("/untrack " + LINKS.get(1)).build();
         SendMessage sendMessage2 = untrackCommand.process(update2);
         TestUtils.checkMessage(sendMessage2, generateUntrackedMessage(LINKS.get(1)));
@@ -55,13 +53,12 @@ public class UntrackCommandTest extends LinksCommandsBaseTest {
 
     @Test
     public void testTwoSenders() {
-        setAllSupported();
         Update update1 = new UpdateMock().withChat().withMessage("/untrack " + LINKS.get(0)).build();
         Update update2 = new UpdateMock().withChat().withMessage("/untrack " + LINKS.get(1)).build();
         final long chatId1 = update1.message().chat().id();
         final long chatId2 = update2.message().chat().id();
-        setAllTracked(chatId1, LINKS.get(0));
-        setAllTracked(chatId2, LINKS.get(1));
+        setTrackingResponse(chatId1, LINKS.get(0));
+        setTrackingResponse(chatId2, LINKS.get(1));
         SendMessage sendMessage1 = untrackCommand.process(update1);
         SendMessage sendMessage2 = untrackCommand.process(update2);
         TestUtils.checkMessage(sendMessage1, generateUntrackedMessage(LINKS.get(0)));
@@ -70,19 +67,19 @@ public class UntrackCommandTest extends LinksCommandsBaseTest {
 
     @Test
     public void testInvalid() {
-        setAllSupported();
-        Update update = new UpdateMock().withChat().withMessage("/untrack not-a-valid-link").build();
+        String invalidLink = "not-a-valid-link";
+        Update update = new UpdateMock().withChat().withMessage("/untrack " + invalidLink).build();
         final long chatId = update.message().chat().id();
-        setAllUntracked(chatId);
+        setInvalidLinkResponse(chatId, invalidLink);
         SendMessage sendMessage = untrackCommand.process(update);
         TestUtils.checkMessage(sendMessage, INVALID_LINK_MSG);
     }
 
     @Test
     public void testSupports() {
-        assertThat(untrackCommand.supports(new UpdateMock().withMessage("/untrack " + LINKS.get(0))
+        assertThat(untrackCommand.supports(new UpdateMock().withMessage("/untrack " + LINKS.getFirst())
             .build())).isTrue();
-        assertThat(untrackCommand.supports(new UpdateMock().withMessage("/track " + LINKS.get(0))
+        assertThat(untrackCommand.supports(new UpdateMock().withMessage("/track " + LINKS.getFirst())
             .build())).isFalse();
     }
 

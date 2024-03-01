@@ -19,28 +19,26 @@ public class TrackCommandTest extends LinksCommandsBaseTest {
 
     @BeforeEach
     public void setUp() {
-        trackCommand = new TrackCommand(linkService);
+        trackCommand = new TrackCommand(scrapperClient);
     }
 
     @Test
     public void testOneMessage() {
-        setAllSupported();
-        Update update = new UpdateMock().withChat().withMessage("/track " + LINKS.get(0)).build();
-        setUntracked(update.message().chat().id(), LINKS.get(0));
+        Update update = new UpdateMock().withChat().withMessage("/track " + LINKS.getFirst()).build();
+        setTrackingResponse(update.message().chat().id(), LINKS.getFirst());
         SendMessage sendMessage = trackCommand.process(update);
-        TestUtils.checkMessage(sendMessage, generateTrackStartMsg(LINKS.get(0)));
+        TestUtils.checkMessage(sendMessage, generateTrackStartMsg(LINKS.getFirst()));
     }
 
     @Test
     public void testTwoMessages() {
-        setAllSupported();
-        Update update1 = new UpdateMock().withChat().withMessage("/track " + LINKS.get(0)).build();
+        Update update1 = new UpdateMock().withChat().withMessage("/track " + LINKS.getFirst()).build();
         final long chatId = update1.message().chat().id();
-        setAllUntracked(chatId);
+        setTrackingResponse(chatId, LINKS.getFirst());
         SendMessage sendMessage1 = trackCommand.process(update1);
-        TestUtils.checkMessage(sendMessage1, generateTrackStartMsg(LINKS.get(0)));
-        setTracked(chatId, LINKS.get(0));
+        TestUtils.checkMessage(sendMessage1, generateTrackStartMsg(LINKS.getFirst()));
 
+        setTrackingResponse(chatId, LINKS.get(1));
         Update update2 = new UpdateMock().withChat(chatId).withMessage("/track " + LINKS.get(1)).build();
         SendMessage sendMessage2 = trackCommand.process(update2);
         TestUtils.checkMessage(sendMessage2, generateTrackStartMsg(LINKS.get(1)));
@@ -48,28 +46,26 @@ public class TrackCommandTest extends LinksCommandsBaseTest {
 
     @Test
     public void testMessageTwice() {
-        setAllSupported();
-        Update update1 = new UpdateMock().withChat().withMessage("/track " + LINKS.get(0)).build();
+        Update update1 = new UpdateMock().withChat().withMessage("/track " + LINKS.getFirst()).build();
         final long chatId = update1.message().chat().id();
-        setAllUntracked(chatId);
+        setTrackingResponse(chatId, LINKS.getFirst());
         SendMessage sendMessage1 = trackCommand.process(update1);
-        TestUtils.checkMessage(sendMessage1, generateTrackStartMsg(LINKS.get(0)));
-        setTracked(chatId, LINKS.get(0));
+        TestUtils.checkMessage(sendMessage1, generateTrackStartMsg(LINKS.getFirst()));
 
-        Update update2 = new UpdateMock().withChat(chatId).withMessage("/track " + LINKS.get(0)).build();
+        setAlreadyTrackingResponse(chatId, LINKS.getFirst());
+        Update update2 = new UpdateMock().withChat(chatId).withMessage("/track " + LINKS.getFirst()).build();
         SendMessage sendMessage2 = trackCommand.process(update2);
         TestUtils.checkMessage(sendMessage2, TRACK_TWICE_MSG);
     }
 
     @Test
     public void testTwoSenders() {
-        setAllSupported();
         Update update1 = new UpdateMock().withChat().withMessage("/track " + LINKS.get(0)).build();
         Update update2 = new UpdateMock().withChat().withMessage("/track " + LINKS.get(1)).build();
         final long chatId1 = update1.message().chat().id();
         final long chatId2 = update2.message().chat().id();
-        setAllUntracked(chatId1);
-        setAllUntracked(chatId2);
+        setTrackingResponse(chatId1, LINKS.get(0));
+        setTrackingResponse(chatId2, LINKS.get(1));
         SendMessage sendMessage1 = trackCommand.process(update1);
         SendMessage sendMessage2 = trackCommand.process(update2);
         TestUtils.checkMessage(sendMessage1, generateTrackStartMsg(LINKS.get(0)));
@@ -78,29 +74,28 @@ public class TrackCommandTest extends LinksCommandsBaseTest {
 
     @Test
     public void testUnsupported() {
-        setSupported("github.com", "miro.com");
-        Update update1 = new UpdateMock().withChat().withMessage("/track " + LINKS.get(0)).build();
+        Update update1 = new UpdateMock().withChat().withMessage("/track " + LINKS.getFirst()).build();
         final long chatId = update1.message().chat().id();
-        setAllUntracked(chatId);
+        setUnsupportedResponse(chatId, LINKS.getFirst(), "github.com", "miro.com");
         SendMessage sendMessage1 = trackCommand.process(update1);
-        TestUtils.checkMessage(sendMessage1, generateUnsupportedMessage("github.com", "miro.com"));
+        TestUtils.checkMessage(sendMessage1, generateUnsupportedMessage(LINKS.getFirst(),"github.com", "miro.com"));
     }
 
     @Test
     public void testInvalid() {
-        setAllSupported();
-        Update update = new UpdateMock().withChat().withMessage("/track not-a-valid-link").build();
+        String invalidLink = "not-a-valid-link";
+        Update update = new UpdateMock().withChat().withMessage("/track " + invalidLink).build();
         final long chatId = update.message().chat().id();
-        setAllUntracked(chatId);
+        setInvalidLinkResponse(chatId, invalidLink);
         SendMessage sendMessage = trackCommand.process(update);
         TestUtils.checkMessage(sendMessage, INVALID_LINK_MSG);
     }
 
     @Test
     public void testSupports() {
-        assertThat(trackCommand.supports(new UpdateMock().withMessage("/track " + LINKS.get(0))
+        assertThat(trackCommand.supports(new UpdateMock().withMessage("/track " + LINKS.getFirst())
             .build())).isTrue();
-        assertThat(trackCommand.supports(new UpdateMock().withMessage("/untrack " + LINKS.get(0))
+        assertThat(trackCommand.supports(new UpdateMock().withMessage("/untrack " + LINKS.getFirst())
             .build())).isFalse();
     }
 
@@ -119,8 +114,8 @@ public class TrackCommandTest extends LinksCommandsBaseTest {
         return String.format("Link %s is now being tracked.", link);
     }
 
-    private String generateUnsupportedMessage(String... supportedDomains) {
-        return "This domain is not supported yet. List of all supported domains:\n" +
+    private String generateUnsupportedMessage(String link, String... supportedDomains) {
+        return "Domain " + TestUtils.toUrl(link).getHost() + " is not supported yet. List of all supported domains:\n" +
             IntStream.range(0, supportedDomains.length).mapToObj(i -> (i + 1) + ". " + supportedDomains[i]).collect(
                 Collectors.joining("\n"));
     }

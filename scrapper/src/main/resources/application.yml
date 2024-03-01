@@ -3,12 +3,19 @@ app:
     enable: true
     interval: 10s
     force-check-delay: 10s
-  github-base-url: https://api.github.com
-  stackoverflow-base-url: https://api.stackexchange.com/2.3
+  base-url:
+    github: https://api.github.com
+    stackoverflow: https://api.stackexchange.com/2.3
+    tracker-bot: http://localhost:8090
 
 spring:
   application:
     name: scrapper
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
 
 server:
   port: 8080

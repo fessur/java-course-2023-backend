@@ -1,4 +1,4 @@
-package edu.java.bot.exception;
+package edu.java.service.exception;
 
 public class NoSuchChatException extends RuntimeException {
     public NoSuchChatException() {

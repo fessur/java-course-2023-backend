@@ -5,10 +5,11 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.TestUtils;
 import edu.java.bot.UpdateMock;
-import edu.java.bot.service.ChatService;
+import edu.java.bot.client.ScrapperClient;
+import edu.java.bot.client.dto.ApiErrorResponse;
+import edu.java.bot.client.exception.ConflictException;
 import edu.java.bot.service.command.StartCommand;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 public class StartCommandTest {
     @Mock
-    private ChatService chatService;
+    private ScrapperClient scrapperClient;
     private StartCommand startCommand;
     private final static String WELCOME = "Hello! Welcome to our bot!";
     private final static String WELCOME_AGAIN =
@@ -29,7 +30,7 @@ public class StartCommandTest {
 
     @BeforeEach
     public void setUp() {
-        startCommand = new StartCommand(chatService);
+        startCommand = new StartCommand(scrapperClient);
     }
 
     @Test
@@ -49,7 +50,7 @@ public class StartCommandTest {
         TestUtils.checkMessage(sendMessage1, WELCOME);
 
         Update update2 = new UpdateMock().withChat(chatId).build();
-        when(chatService.find(chatId)).thenReturn(Optional.of(new edu.java.bot.domain.Chat(chatId, List.of())));
+        doThrow(new ConflictException(createConflictErrorResponse())).when(scrapperClient).registerChat(chatId);
         SendMessage sendMessage2 = startCommand.process(update2);
         TestUtils.checkMessage(sendMessage2, WELCOME_AGAIN);
     }
@@ -61,7 +62,6 @@ public class StartCommandTest {
         TestUtils.checkMessage(sendMessage1, WELCOME);
 
         Update updateFrom2 = new UpdateMock().withChat().build();
-        when(chatService.find(updateFrom2.message().chat().id())).thenReturn(Optional.empty());
         SendMessage sendMessage2 = startCommand.process(updateFrom2);
         TestUtils.checkMessage(sendMessage2, WELCOME);
     }
@@ -81,5 +81,15 @@ public class StartCommandTest {
     @Test
     public void testToApiCommand() {
         assertThat(startCommand.toApiCommand()).isNotNull().isEqualTo(new BotCommand("start", DESCRIPTION));
+    }
+
+    private ApiErrorResponse createConflictErrorResponse() {
+        return new ApiErrorResponse(
+            "Chat is already registered",
+            "409",
+            "ChatAlreadyRegisteredException",
+            "Chat is already registered",
+            List.of("stacktrace")
+        );
     }
 }

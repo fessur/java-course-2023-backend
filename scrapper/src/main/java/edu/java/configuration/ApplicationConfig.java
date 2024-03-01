@@ -1,5 +1,6 @@
 package edu.java.configuration;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,9 +13,16 @@ public record ApplicationConfig(
     @NotNull
     @Bean
     Scheduler scheduler,
-    String githubBaseUrl,
-    String stackoverflowBaseUrl
+
+    @NotNull
+    BaseUrl baseUrl,
+
+    @NotEmpty
+    String localDbPath
 ) {
     public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
+    }
+
+    public record BaseUrl(@NotEmpty String github, @NotEmpty String stackoverflow, @NotEmpty String trackerBot) {
     }
 }
