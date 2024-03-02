@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.*;
 
-@WireMockTest(httpPort = 8084)
+@WireMockTest(httpPort = 8089)
 public class ScrapperClientTest {
     private ScrapperClient scrapperClient;
     private static final String CHAT_URL = "/tg-chat";
@@ -38,7 +38,7 @@ public class ScrapperClientTest {
 
     @BeforeEach
     void setUp() {
-        scrapperClient = new ScrapperClientImpl("http://localhost:8084");
+        scrapperClient = new ScrapperClientImpl("http://localhost:8089");
     }
 
     @Test
