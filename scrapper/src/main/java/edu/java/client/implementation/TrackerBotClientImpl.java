@@ -23,7 +23,7 @@ public class TrackerBotClientImpl implements TrackerBotClient {
             .uri("/updates")
             .bodyValue(new LinkUpdateRequest(link.getId(), link.getUrl(), description, chatIds))
             .retrieve()
-            .onStatus(HttpStatus.CONFLICT::isSameCodeAs, clientResponse ->
+            .onStatus(HttpStatus.BAD_REQUEST::isSameCodeAs, clientResponse ->
                 clientResponse.bodyToMono(ApiErrorResponse.class)
                     .flatMap(apiErrorResponse -> Mono.error(new BadRequestException(apiErrorResponse)))
             )

@@ -5,6 +5,7 @@ import edu.java.bot.client.dto.AddLinkRequest;
 import edu.java.bot.client.dto.ApiErrorResponse;
 import edu.java.bot.client.dto.LinkResponse;
 import edu.java.bot.client.dto.ListLinksResponse;
+import edu.java.bot.client.dto.RemoveLinkRequest;
 import edu.java.bot.client.exception.BadRequestException;
 import edu.java.bot.client.exception.ConflictException;
 import edu.java.bot.client.exception.NotFoundException;
@@ -79,7 +80,7 @@ public class ScrapperClientImpl implements ScrapperClient {
             .method(HttpMethod.DELETE)
             .uri(LINKS_API_URL)
             .header(CHAT_HEADER, Long.toString(chatId))
-            .bodyValue(new AddLinkRequest(link))
+            .bodyValue(new RemoveLinkRequest(link))
             .retrieve()
             .onStatus(HttpStatus.NOT_FOUND::isSameCodeAs, clientResponse ->
                 handleStatusCode(clientResponse, NotFoundException::new)
