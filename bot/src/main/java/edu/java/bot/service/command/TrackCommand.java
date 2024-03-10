@@ -37,7 +37,7 @@ public class TrackCommand extends Command {
             );
             return new SendMessage(
                 update.message().chat().id(),
-                "Link " + linkResponse.getUrl() + " is now being tracked."
+                "Link " + linkResponse.url() + " is now being tracked."
             );
         } catch (ConflictException ex) {
             return new SendMessage(update.message().chat().id(), "You are already tracking this link.");

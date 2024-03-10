@@ -38,7 +38,7 @@ public class ListCommand extends Command {
         return new SendMessage(
             update.message().chat().id(),
             "Your tracked links:\n"
-                + CommonUtils.joinEnumerated(links.getLinks().stream().map(LinkResponse::getUrl).toList(), 1)
+                + CommonUtils.joinEnumerated(links.getLinks().stream().map(LinkResponse::url).toList(), 1)
         );
     }
 }

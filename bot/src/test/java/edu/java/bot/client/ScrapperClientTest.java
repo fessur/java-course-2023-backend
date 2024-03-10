@@ -88,10 +88,9 @@ public class ScrapperClientTest {
         ListLinksResponse response = scrapperClient.fetchLinks(chatId);
         ListLinksResponse expectedResponse = new ListLinksResponse();
         expectedResponse.setLinks(IntStream.range(0, size).mapToObj(index -> {
-            LinkResponse linkResponse = new LinkResponse();
-            linkResponse.setId(linkIds.get(index));
-            linkResponse.setUrl(TestUtils.toUrl(LINKS.get(index)));
-            return linkResponse;
+            //            linkResponse.setId(linkIds.get(index));
+//            linkResponse.setUrl(TestUtils.toUrl(LINKS.get(index)));
+            return new LinkResponse(linkIds.get(index), TestUtils.toUrl(LINKS.get(index)));
         }).toList());
         expectedResponse.setSize(size);
 
@@ -119,8 +118,8 @@ public class ScrapperClientTest {
                 .withHeader("Content-Type", "application/json")
                 .withBody(createLinkResponse(linkId, LINKS.getFirst()))));
         assertThat(scrapperClient.trackLink(chatId, LINKS.getFirst())).extracting(
-            LinkResponse::getId,
-            LinkResponse::getUrl
+            LinkResponse::id,
+            LinkResponse::url
         ).containsExactly(linkId, TestUtils.toUrl(LINKS.getFirst()));
     }
 
@@ -177,8 +176,8 @@ public class ScrapperClientTest {
                 .withHeader("Content-Type", "application/json")
                 .withBody(createLinkResponse(linkId, LINKS.getFirst()))));
         assertThat(scrapperClient.untrackLink(chatId, LINKS.getFirst())).extracting(
-            LinkResponse::getId,
-            LinkResponse::getUrl
+            LinkResponse::id,
+            LinkResponse::url
         ).containsExactly(linkId, TestUtils.toUrl(LINKS.getFirst()));
     }
 

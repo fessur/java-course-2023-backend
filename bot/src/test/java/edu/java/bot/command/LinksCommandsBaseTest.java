@@ -77,21 +77,13 @@ public class LinksCommandsBaseTest {
         ListLinksResponse response = new ListLinksResponse();
         response.setSize(links.length);
         response.setLinks(IntStream.range(0, links.length)
-            .mapToObj(index -> {
-                LinkResponse linkResponse = new LinkResponse();
-                linkResponse.setId(index + 1);
-                linkResponse.setUrl(TestUtils.toUrl(links[index]));
-                return linkResponse;
-            })
+            .mapToObj(index -> new LinkResponse(index + 1, TestUtils.toUrl(links[index])))
             .toList());
         return response;
     }
 
     private LinkResponse createTrackingResponse(String link) {
-        LinkResponse response = new LinkResponse();
-        response.setId(new Random().nextInt());
-        response.setUrl(TestUtils.toUrl(link));
-        return response;
+        return new LinkResponse(new Random().nextInt(), TestUtils.toUrl(link));
     }
 
     private ApiErrorResponse createAlreadyTrackingResponse() {
