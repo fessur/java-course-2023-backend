@@ -86,14 +86,8 @@ public class ScrapperClientTest {
         );
 
         ListLinksResponse response = scrapperClient.fetchLinks(chatId);
-        ListLinksResponse expectedResponse = new ListLinksResponse();
-        expectedResponse.setLinks(IntStream.range(0, size).mapToObj(index -> {
-            //            linkResponse.setId(linkIds.get(index));
-//            linkResponse.setUrl(TestUtils.toUrl(LINKS.get(index)));
-            return new LinkResponse(linkIds.get(index), TestUtils.toUrl(LINKS.get(index)));
-        }).toList());
-        expectedResponse.setSize(size);
-
+        ListLinksResponse expectedResponse = new ListLinksResponse(IntStream.range(0, size)
+            .mapToObj(index -> new LinkResponse(linkIds.get(index), TestUtils.toUrl(LINKS.get(index)))).toList(), size);
         assertThat(response).usingRecursiveComparison().isEqualTo(expectedResponse);
     }
 

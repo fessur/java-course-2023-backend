@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,9 +35,8 @@ public class ChatController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
-    public ResponseEntity<Void> register(@PathVariable("id") long id) {
+    public void register(@PathVariable("id") long id) {
         chatService.register(id);
-        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
@@ -52,8 +50,7 @@ public class ChatController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
-    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
+    public void delete(@PathVariable("id") long id) {
         chatService.delete(id);
-        return ResponseEntity.ok().build();
     }
 }

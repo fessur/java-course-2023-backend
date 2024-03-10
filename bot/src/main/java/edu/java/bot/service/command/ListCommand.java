@@ -29,7 +29,7 @@ public class ListCommand extends Command {
     @Override
     public SendMessage process(Update update) {
         ListLinksResponse links = scrapperClient.fetchLinks(update.message().chat().id());
-        if (links.getLinks().isEmpty()) {
+        if (links.links().isEmpty()) {
             return new SendMessage(
                 update.message().chat().id(),
                 "You don't have any tracked links.\nUse /track to start tracking."
@@ -38,7 +38,7 @@ public class ListCommand extends Command {
         return new SendMessage(
             update.message().chat().id(),
             "Your tracked links:\n"
-                + CommonUtils.joinEnumerated(links.getLinks().stream().map(LinkResponse::url).toList(), 1)
+                + CommonUtils.joinEnumerated(links.links().stream().map(LinkResponse::url).toList(), 1)
         );
     }
 }

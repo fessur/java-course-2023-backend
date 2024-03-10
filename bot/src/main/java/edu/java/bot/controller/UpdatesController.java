@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,10 +46,7 @@ public class UpdatesController {
             return ResponseEntity.badRequest()
                 .body(new ApiErrorResponse(
                     bindingResult.getAllErrors().getFirst().getDefaultMessage(),
-                    "400",
-                    "",
-                    "",
-                    List.of()
+                    Integer.toString(HttpStatus.BAD_REQUEST.value())
                 ));
         }
         botService.sendMessages(request.getTgChatIds(), request.getUrl(), request.getDescription());

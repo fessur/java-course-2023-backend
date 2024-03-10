@@ -74,12 +74,9 @@ public class LinksCommandsBaseTest {
     }
 
     private ListLinksResponse createFetchLinksResponse(String... links) {
-        ListLinksResponse response = new ListLinksResponse();
-        response.setSize(links.length);
-        response.setLinks(IntStream.range(0, links.length)
+        return new ListLinksResponse(IntStream.range(0, links.length)
             .mapToObj(index -> new LinkResponse(index + 1, TestUtils.toUrl(links[index])))
-            .toList());
-        return response;
+            .toList(), links.length);
     }
 
     private LinkResponse createTrackingResponse(String link) {
@@ -100,20 +97,14 @@ public class LinksCommandsBaseTest {
         return new ApiErrorResponse(
             "Domain " + TestUtils.toUrl(link).getHost() + " is not supported yet. List of all supported domains:\n"
                 + CommonUtils.joinEnumerated(Arrays.stream(domains).toList(), 1),
-            "400",
-            "",
-            "",
-            List.of()
+            "400"
         );
     }
 
     private ApiErrorResponse createInvalidLinkResponse() {
         return new ApiErrorResponse(
             "The link is not correct",
-            "400",
-            "",
-            "",
-            List.of()
+            "400"
         );
     }
 

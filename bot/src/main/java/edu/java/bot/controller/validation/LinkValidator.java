@@ -19,13 +19,10 @@ public class LinkValidator implements ConstraintValidator<CorrectLink, String> {
 
     @Override
     public boolean isValid(String link, ConstraintValidatorContext constraintValidatorContext) {
-        constraintValidatorContext.disableDefaultConstraintViolation();
         try {
             URL parsed = new URI(link).toURL();
             return true;
         } catch (MalformedURLException | URISyntaxException | IllegalArgumentException ex) {
-            constraintValidatorContext.buildConstraintViolationWithTemplate("The link is not correct")
-                .addConstraintViolation();
             return false;
         }
     }

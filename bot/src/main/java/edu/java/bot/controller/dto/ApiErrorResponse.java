@@ -9,4 +9,7 @@ public record ApiErrorResponse(
     String exceptionMessage,
     List<String> stacktrace
 ) {
+    public ApiErrorResponse(String description, String code) {
+        this(description, code, "", "", List.of());
+    }
 }

@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CorrectLink {
-    String message() default "";
+    String message() default "The link is not correct";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
