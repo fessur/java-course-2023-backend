@@ -1,22 +1,25 @@
 package edu.java.bot;
 
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.domain.Link;
-import edu.java.bot.util.CommonUtils;
+
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import static org.assertj.core.api.Assertions.*;
 
-public class TestUtils {
+public final class TestUtils {
+    private TestUtils() {}
+
     public static void checkMessage(SendMessage sendMessage, String message) {
         assertThat(sendMessage).isNotNull().extracting(SendMessage::getParameters).isNotNull()
             .extracting(p -> p.get("text")).isNotNull().isEqualTo(message);
     }
 
-    public static Link parseLink(String link) {
+    public static URL toUrl(String link) {
         try {
-            return CommonUtils.parse(link);
-        } catch (Exception ignored) {
-            // no-operations.
+            return URI.create(link).toURL();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        throw new AssertionError("Invalid link");
     }
 }

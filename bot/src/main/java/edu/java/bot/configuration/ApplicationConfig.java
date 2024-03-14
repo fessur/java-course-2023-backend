@@ -9,8 +9,7 @@ import org.springframework.validation.annotation.Validated;
 public record ApplicationConfig(
     @NotEmpty
     String telegramToken,
-
     @NotEmpty
-    String localDbPath
+    String scrapperBaseUrl
 ) {
 }

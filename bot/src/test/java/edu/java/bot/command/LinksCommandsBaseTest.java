@@ -1,12 +1,18 @@
 package edu.java.bot.command;
 
 import edu.java.bot.TestUtils;
-import edu.java.bot.domain.Link;
-import edu.java.bot.service.LinkService;
+
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Random;
+import java.util.stream.IntStream;
+import edu.java.bot.client.ScrapperClient;
+import edu.java.bot.client.dto.ApiErrorResponse;
+import edu.java.bot.client.dto.LinkResponse;
+import edu.java.bot.client.dto.ListLinksResponse;
+import edu.java.bot.client.exception.BadRequestException;
+import edu.java.bot.client.exception.ConflictException;
+import edu.java.bot.client.exception.NotFoundException;
 import edu.java.bot.util.CommonUtils;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,7 +22,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class LinksCommandsBaseTest {
     @Mock
-    protected LinkService linkService;
+    protected ScrapperClient scrapperClient;
     protected static final List<String> LINKS = List.of(
         "https://stackoverflow.com/questions/927358/how-do-i-undo-the-most-recent-local-commits-in-git",
         "https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-locally-and-remotely",
@@ -30,42 +36,85 @@ public class LinksCommandsBaseTest {
         "https://www.google.com/"
     );
 
-    protected static final String INVALID_LINK_MSG = "The link is not correct.";
+    protected static final String INVALID_LINK_MSG = "The link is not correct";
 
-    protected void setUntracked(long chatId, String link) {
-        lenient().when(linkService.find(chatId, link)).thenReturn(Optional.empty());
+    protected void setAllUntrackedResponse(long chatId) {
+        lenient().when(scrapperClient.fetchLinks(chatId)).thenReturn(createFetchLinksResponse());
     }
 
-    protected void setAllUntracked(long chatId) {
-        lenient().when(linkService.findAll(chatId)).thenReturn(List.of());
+    protected void setAllTrackedResponse(long chatId, String... links) {
+        lenient().when(scrapperClient.fetchLinks(chatId)).thenReturn(createFetchLinksResponse(links));
     }
 
-    protected void setTracked(long chatId, String link) {
-        try {
-            lenient().when(linkService.find(chatId, link)).thenReturn(Optional.of(CommonUtils.parse(link)));
-        } catch (Exception ignored) {
-            // no-operations.
-        }
+    protected void setTrackingResponse(long chatId, String link) {
+        lenient().when(scrapperClient.trackLink(chatId, link)).thenReturn(createTrackingResponse(link));
+        lenient().when(scrapperClient.untrackLink(chatId, link)).thenReturn(createTrackingResponse(link));
     }
 
-    protected void setAllTracked(long chatId, String... links) {
-        lenient().when(linkService.findAll(chatId))
-            .thenReturn(Arrays.stream(links).map(TestUtils::parseLink).collect(Collectors.toList()));
-        lenient().when(linkService.find(eq(chatId), any(String.class))).thenAnswer(invocation -> {
-            String link = invocation.getArgument(1);
-            return Arrays.stream(links).filter(link::equals).findFirst().map(TestUtils::parseLink);
-        });
+    protected void setAlreadyTrackingResponse(long chatId, String link) {
+        lenient().when(scrapperClient.trackLink(chatId, link))
+            .thenThrow(new ConflictException(createAlreadyTrackingResponse()));
     }
 
-    protected void setSupported(String... domains) {
-        lenient().when(linkService.isSupported(any(Link.class))).thenAnswer(invocation -> {
-            Link link = invocation.getArgument(0);
-            return Arrays.stream(domains).anyMatch(d -> link.getDomain().equals(d));
-        });
-        lenient().when(linkService.getSupportedDomains()).thenReturn(Arrays.asList(domains));
+    protected void setUnsupportedResponse(long chatId, String link, String... domains) {
+        lenient().when(scrapperClient.trackLink(chatId, link))
+            .thenThrow(new BadRequestException(createUnsupportedResponse(link, domains)));
     }
 
-    protected void setAllSupported() {
-        lenient().when(linkService.isSupported(any(Link.class))).thenReturn(true);
+    protected void setInvalidLinkResponse(long chatId, String link) {
+        lenient().when(scrapperClient.trackLink(chatId, link))
+            .thenThrow(new BadRequestException(createInvalidLinkResponse()));
+        lenient().when(scrapperClient.untrackLink(chatId, link))
+            .thenThrow(new BadRequestException(createInvalidLinkResponse()));
+    }
+
+    protected void setNotTrackingYetResponse(long chatId, String link) {
+        lenient().when(scrapperClient.untrackLink(chatId, link))
+            .thenThrow(new NotFoundException(createNotTrackingYetResponse()));
+    }
+
+    private ListLinksResponse createFetchLinksResponse(String... links) {
+        return new ListLinksResponse(IntStream.range(0, links.length)
+            .mapToObj(index -> new LinkResponse(index + 1, TestUtils.toUrl(links[index])))
+            .toList(), links.length);
+    }
+
+    private LinkResponse createTrackingResponse(String link) {
+        return new LinkResponse(new Random().nextInt(), TestUtils.toUrl(link));
+    }
+
+    private ApiErrorResponse createAlreadyTrackingResponse() {
+        return new ApiErrorResponse(
+            "Link is already tracking",
+            "409",
+            "LinkAlreadyTrackingException",
+            "Link is already tracking",
+            List.of("stacktrace")
+        );
+    }
+
+    private ApiErrorResponse createUnsupportedResponse(String link, String... domains) {
+        return new ApiErrorResponse(
+            "Domain " + TestUtils.toUrl(link).getHost() + " is not supported yet. List of all supported domains:\n"
+                + CommonUtils.joinEnumerated(Arrays.stream(domains).toList(), 1),
+            "400"
+        );
+    }
+
+    private ApiErrorResponse createInvalidLinkResponse() {
+        return new ApiErrorResponse(
+            "The link is not correct",
+            "400"
+        );
+    }
+
+    private ApiErrorResponse createNotTrackingYetResponse() {
+        return new ApiErrorResponse(
+            "The link is not tracked by this chat",
+            "404",
+            "NoSuchLinkException",
+            "Cannot find link",
+            List.of()
+        );
     }
 }

@@ -1,9 +1,9 @@
-package edu.java.bot.service;
+package edu.java.service;
 
-import edu.java.bot.domain.Chat;
-import edu.java.bot.repository.ChatRepository;
+import edu.java.repository.ChatRepository;
+import edu.java.service.domain.Chat;
+import edu.java.service.exception.ChatAlreadyRegisteredException;
 import java.util.ArrayList;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,11 +15,14 @@ public class ChatService {
     }
 
     public void register(long id) {
+        chatRepository.findById(id).ifPresent(c -> {
+            throw new ChatAlreadyRegisteredException("Chat is already registered");
+        });
         Chat chat = new Chat(id, new ArrayList<>());
         chatRepository.save(chat);
     }
 
-    public Optional<Chat> find(long id) {
-        return chatRepository.findById(id);
+    public void delete(long id) {
+        chatRepository.delete(id);
     }
 }

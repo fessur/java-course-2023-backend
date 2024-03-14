@@ -2,17 +2,16 @@ package edu.java.bot.service.command;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.domain.Chat;
-import edu.java.bot.service.ChatService;
-import java.util.Optional;
+import edu.java.bot.client.ScrapperClient;
+import edu.java.bot.client.exception.ConflictException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StartCommand extends Command {
-    private final ChatService chatService;
+    private final ScrapperClient scrapperClient;
 
-    public StartCommand(ChatService chatService) {
-        this.chatService = chatService;
+    public StartCommand(ScrapperClient scrapperClient) {
+        this.scrapperClient = scrapperClient;
     }
 
     @Override
@@ -27,12 +26,13 @@ public class StartCommand extends Command {
 
     @Override
     public SendMessage process(Update update) {
-        Optional<Chat> optionalChat = chatService.find(update.message().chat().id());
-        if (optionalChat.isEmpty()) {
-            chatService.register(update.message().chat().id());
-            return new SendMessage(update.message().chat().id(), "Hello! Welcome to our bot!");
+        try {
+            scrapperClient.registerChat(update.message().chat().id());
+        } catch (ConflictException ex) {
+            return new SendMessage(
+                update.message().chat().id(),
+                "You are already working with our bot. Use /help to see a list of all possible commands");
         }
-        return new SendMessage(update.message().chat().id(),
-            "You are already working with our bot. Use /help to see a list of all possible commands");
+        return new SendMessage(update.message().chat().id(), "Hello! Welcome to our bot!");
     }
 }

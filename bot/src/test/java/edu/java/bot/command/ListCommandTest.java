@@ -19,21 +19,20 @@ public class ListCommandTest extends LinksCommandsBaseTest {
 
     @BeforeEach
     public void setUp() {
-        listCommand = new ListCommand(linkService);
+        listCommand = new ListCommand(scrapperClient);
     }
 
     @Test
     public void testEmpty() {
         Update update1 = new UpdateMock().withChat().build();
         final long chatId = update1.message().chat().id();
+        setAllUntrackedResponse(chatId);
         SendMessage sendMessage1 = listCommand.process(update1);
         TestUtils.checkMessage(sendMessage1, LIST_EMPTY_MSG);
 
-        setAllTracked(chatId, LINKS.get(0), LINKS.get(1), LINKS.get(1));
-        setUntracked(chatId, LINKS.get(0));
+        setAllTrackedResponse(chatId, LINKS.get(0), LINKS.get(1), LINKS.get(1));
         listCommand.process(new UpdateMock().withChat(chatId).build());
-        setTracked(chatId, LINKS.get(3));
-        setAllUntracked(chatId);
+        setAllUntrackedResponse(chatId);
 
         Update update2 = new UpdateMock().withChat(chatId).build();
         SendMessage sendMessage2 = listCommand.process(update2);
@@ -47,7 +46,7 @@ public class ListCommandTest extends LinksCommandsBaseTest {
 
         Update update = new UpdateMock().withChat().build();
         final long chatId = update.message().chat().id();
-        setAllTracked(chatId, links);
+        setAllTrackedResponse(chatId, links);
         SendMessage sendMessage = listCommand.process(update);
         TestUtils.checkMessage(sendMessage, expectedMessage);
     }
@@ -59,7 +58,7 @@ public class ListCommandTest extends LinksCommandsBaseTest {
 
         Update update1 = new UpdateMock().withChat().build();
         final long chatId = update1.message().chat().id();
-        setAllTracked(chatId, links);
+        setAllTrackedResponse(chatId, links);
         SendMessage sendMessage1 = listCommand.process(update1);
         TestUtils.checkMessage(sendMessage1, expectedMessage);
 
@@ -75,12 +74,12 @@ public class ListCommandTest extends LinksCommandsBaseTest {
 
         Update update1 = new UpdateMock().withChat().build();
         final long chatId = update1.message().chat().id();
-        setAllTracked(chatId, links1);
+        setAllTrackedResponse(chatId, links1);
         SendMessage sendMessage1 = listCommand.process(update1);
         TestUtils.checkMessage(sendMessage1, expectedMessage1);
 
         final String[] links2 = {LINKS.get(4), LINKS.get(5), LINKS.get(6), LINKS.get(7), LINKS.get(8)};
-        setAllTracked(chatId, links2);
+        setAllTrackedResponse(chatId, links2);
         final String expectedMessage2 = generateListMsg(links2);
 
         Update update2 = new UpdateMock().withChat(chatId).build();
@@ -99,8 +98,8 @@ public class ListCommandTest extends LinksCommandsBaseTest {
         Update update2 = new UpdateMock().withChat().build();
         final long chatId1 = update1.message().chat().id();
         final long chatId2 = update2.message().chat().id();
-        setAllTracked(chatId1, links1);
-        setAllTracked(chatId2, links2);
+        setAllTrackedResponse(chatId1, links1);
+        setAllTrackedResponse(chatId2, links2);
 
         SendMessage sendMessage1 = listCommand.process(update1);
         SendMessage sendMessage2 = listCommand.process(update2);
@@ -111,7 +110,7 @@ public class ListCommandTest extends LinksCommandsBaseTest {
     @Test
     public void testSupports() {
         assertThat(listCommand.supports(new UpdateMock().withMessage("/list").build())).isTrue();
-        assertThat(listCommand.supports(new UpdateMock().withMessage("/track " + LINKS.get(0))
+        assertThat(listCommand.supports(new UpdateMock().withMessage("/track " + LINKS.getFirst())
             .build())).isFalse();
     }
 
