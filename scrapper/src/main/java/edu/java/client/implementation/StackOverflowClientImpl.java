@@ -4,6 +4,7 @@ import edu.java.client.StackOverflowClient;
 import edu.java.client.dto.StackOverflowPostResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import java.util.Optional;
 
 public class StackOverflowClientImpl implements StackOverflowClient {
     private final WebClient webClient;
@@ -13,11 +14,15 @@ public class StackOverflowClientImpl implements StackOverflowClient {
     }
 
     @Override
-    public StackOverflowPostResponse fetchPost(long postId) {
+    public Optional<StackOverflowPostResponse> fetchPost(long postId) {
         return webClient.get()
             .uri("/posts/{postId}?site=stackoverflow&filter=!nNPvSNOTRz", postId)
-            .retrieve()
-            .bodyToMono(StackOverflowPostResponse.class)
+            .exchangeToMono(response -> {
+                if (response.statusCode().is4xxClientError()) {
+                    return Mono.just(Optional.<StackOverflowPostResponse>empty());
+                }
+                return response.bodyToMono(StackOverflowPostResponse.class).flatMap(r -> Mono.just(Optional.of(r)));
+            })
             .block();
     }
 

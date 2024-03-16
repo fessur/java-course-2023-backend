@@ -141,19 +141,21 @@ public class GithubClientTest {
                       "network_count": 51043,
                       "subscribers_count": 8334
                     }""")));
-        GithubRepositoryResponse response = githubClient.fetchRepository(new GithubRepositoryRequest(owner, repository));
 
-        assertThat(response)
-            .isNotNull()
-            .extracting(
-                GithubRepositoryResponse::id,
-                GithubRepositoryResponse::name,
-                GithubRepositoryResponse::lastActivityDate
-            )
-            .containsExactly(
-                2325298L,
-                String.format("%s/%s", owner, repository),
-                OffsetDateTime.parse("2024-02-23T15:30:57Z")
-            );
+        assertThat(githubClient.fetchRepository(new GithubRepositoryRequest(owner, repository)))
+            .isPresent()
+            .hasValueSatisfying(response ->
+                assertThat(response)
+                .extracting(
+                    GithubRepositoryResponse::id,
+                    GithubRepositoryResponse::name,
+                    GithubRepositoryResponse::lastActivityDate
+                )
+                .containsExactly(
+                    2325298L,
+                    String.format("%s/%s", owner, repository),
+                    OffsetDateTime.parse("2024-02-23T15:30:57Z")
+                ));
+
     }
 }

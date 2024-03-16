@@ -6,9 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
-public class JdbcLinkRepositoryTest extends JdbcBaseRepositoryTest {
+public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Autowired
     private LinkRepository linkRepository;
 
@@ -96,5 +99,46 @@ public class JdbcLinkRepositoryTest extends JdbcBaseRepositoryTest {
     public void findAllTest() {
         assertThat(linkRepository.findAll()).extracting(Link::url)
             .containsExactlyInAnyOrder(links.toArray(String[]::new));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void updateTest() {
+        Link newLink = new Link(-1, "url", OffsetDateTime.now().minusHours(10), OffsetDateTime.now());
+        jdbcTemplate.update(
+            "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
+            newLink.url(),
+            newLink.lastCheckTime(),
+            newLink.createdAt()
+        );
+        assertThat(linkRepository.findByURL("url")).isPresent().hasValueSatisfying(link -> {
+            linkRepository.updateLastCheckTime(link.id());
+            assertThat(linkRepository.findByURL("url")).isPresent().hasValueSatisfying(l -> {
+                assertThat(l.lastCheckTime()).isAfter(newLink.lastCheckTime());
+            });
+        });
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void findOldestTest() {
+        List.of(
+            new Link(-1, "url1", OffsetDateTime.now().minusHours(10), OffsetDateTime.now()),
+            new Link(-1, "url2", OffsetDateTime.now().minusHours(7), OffsetDateTime.now()),
+            new Link(-1, "url3", OffsetDateTime.now().minusHours(5), OffsetDateTime.now()),
+            new Link(-1, "url4", OffsetDateTime.now().minusHours(2), OffsetDateTime.now())
+        ).forEach(link -> {
+            jdbcTemplate.update(
+                "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
+                link.url(),
+                link.lastCheckTime(),
+                link.createdAt()
+            );
+        });
+
+        assertThat(linkRepository.findOldest(Duration.ofHours(4))).extracting(Link::url)
+            .containsExactlyInAnyOrder("url1", "url2", "url3");
     }
 }

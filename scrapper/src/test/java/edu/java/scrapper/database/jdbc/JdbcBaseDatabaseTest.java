@@ -13,7 +13,7 @@ import java.util.List;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class JdbcBaseRepositoryTest extends IntegrationTest {
+public abstract class JdbcBaseDatabaseTest extends IntegrationTest {
     @Autowired
     private DataSource dataSource;
 

@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import javax.sql.DataSource;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -23,7 +24,11 @@ public class JdbcLinkRepository implements LinkRepository {
     @Transactional
     public void add(Link link, long chatId) {
         jdbcTemplate.update("INSERT INTO link (url) VALUES (?)", link.url());
-        jdbcTemplate.update("INSERT INTO chat_link (chat_id, link_id) VALUES (?, (SELECT id FROM link WHERE url = ?))", chatId, link.url());
+        jdbcTemplate.update(
+            "INSERT INTO chat_link (chat_id, link_id) VALUES (?, (SELECT id FROM link WHERE url = ?))",
+            chatId,
+            link.url()
+        );
     }
 
     @Override
@@ -49,7 +54,12 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public boolean checkConnected(long linkId, long chatId) {
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject("SELECT EXISTS (SELECT 1 FROM chat_link WHERE chat_id = ? AND link_id = ?)", Boolean.class, chatId, linkId));
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(
+            "SELECT EXISTS (SELECT 1 FROM chat_link WHERE chat_id = ? AND link_id = ?)",
+            Boolean.class,
+            chatId,
+            linkId
+        ));
     }
 
     @Override
@@ -60,5 +70,19 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Collection<Link> findAll() {
         return jdbcTemplate.query("SELECT * FROM link", LINK_MAPPER);
+    }
+
+    @Override
+    public void updateLastCheckTime(long linkId) {
+        jdbcTemplate.update("UPDATE link SET last_check_time = CURRENT_TIMESTAMP WHERE id = ?", linkId);
+    }
+
+    @Override
+    public Collection<Link> findOldest(Duration duration) {
+        String sql = "SELECT * FROM link WHERE last_check_time < CURRENT_TIMESTAMP - INTERVAL '" + duration.getSeconds() + " seconds'";
+        return jdbcTemplate.query(
+            sql,
+            LINK_MAPPER
+        );
     }
 }

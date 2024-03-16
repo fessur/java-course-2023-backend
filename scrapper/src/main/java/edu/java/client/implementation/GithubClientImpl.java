@@ -3,9 +3,9 @@ package edu.java.client.implementation;
 import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.dto.GithubRepositoryResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import java.util.Optional;
 
 public class GithubClientImpl implements GithubClient {
     private final WebClient webClient;
@@ -15,11 +15,15 @@ public class GithubClientImpl implements GithubClient {
     }
 
     @Override
-    public GithubRepositoryResponse fetchRepository(GithubRepositoryRequest request) {
+    public Optional<GithubRepositoryResponse> fetchRepository(GithubRepositoryRequest request) {
         return webClient.get()
             .uri("/repos/{owner}/{repo}", request.owner(), request.repo())
-            .retrieve()
-            .bodyToMono(GithubRepositoryResponse.class)
+            .exchangeToMono(response -> {
+                if (response.statusCode().is4xxClientError()) {
+                    return Mono.just(Optional.<GithubRepositoryResponse>empty());
+                }
+                return response.bodyToMono(GithubRepositoryResponse.class).flatMap(r -> Mono.just(Optional.of(r)));
+            })
             .block();
     }
 

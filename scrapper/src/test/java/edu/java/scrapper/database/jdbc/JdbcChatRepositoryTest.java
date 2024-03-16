@@ -8,7 +8,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.*;
 
-public class JdbcChatRepositoryTest extends JdbcBaseRepositoryTest {
+public class JdbcChatRepositoryTest extends JdbcBaseDatabaseTest {
     @Autowired
     private ChatRepository chatRepository;
 
