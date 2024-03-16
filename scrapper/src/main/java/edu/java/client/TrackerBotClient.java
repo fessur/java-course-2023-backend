@@ -1,6 +1,6 @@
 package edu.java.client;
 
-import edu.java.service.domain.Link;
+import edu.java.repository.dto.Link;
 import java.util.List;
 
 public interface TrackerBotClient {

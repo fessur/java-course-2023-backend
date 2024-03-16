@@ -9,25 +9,15 @@ import edu.java.service.exception.NoSuchChatException;
 import edu.java.service.exception.NoSuchLinkException;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
-import java.util.List;
 
 @Service
 public class JdbcLinkService implements LinkService {
-    private static final List<String> SUPPORTED_DOMAINS = List.of("github.com", "stackoverflow.com");
     private final ChatRepository chatRepository;
     private final LinkRepository linkRepository;
 
     public JdbcLinkService(ChatRepository chatRepository, LinkRepository linkRepository) {
         this.chatRepository = chatRepository;
         this.linkRepository = linkRepository;
-    }
-
-    public List<String> getSupportedDomains() {
-        return SUPPORTED_DOMAINS;
-    }
-
-    public boolean isSupported(String domain) {
-        return SUPPORTED_DOMAINS.contains(domain);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package edu.java.repository.dto;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
-public record Link(long id, String url, Date lastCheckTime, Date createdAt) {
+public record Link(long id, String url, OffsetDateTime lastCheckTime, OffsetDateTime createdAt) {
 }

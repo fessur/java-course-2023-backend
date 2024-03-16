@@ -36,7 +36,7 @@ public abstract class IntegrationTest {
             Database database =
                 DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection));
             ResourceAccessor changeLogDir = new DirectoryResourceAccessor(
-                new File(".").toPath().toAbsolutePath().getParent().getParent().resolve("migrations"));
+                new File(".").toPath().toAbsolutePath().resolve("src/main/resources/migrations"));
             Liquibase liquibase =
                 new Liquibase("master.xml", changeLogDir, database);
             liquibase.update(new Contexts(), new LabelExpression());

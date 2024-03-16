@@ -1,6 +1,6 @@
 package edu.java.repository.dto;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
-public record Chat(long id, Date createdAt) {
+public record Chat(long id, OffsetDateTime createdAt) {
 }

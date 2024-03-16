@@ -4,8 +4,8 @@ import edu.java.client.TrackerBotClient;
 import edu.java.client.dto.LinkUpdateRequest;
 import edu.java.client.exception.BadRequestException;
 import edu.java.controller.dto.ApiErrorResponse;
-import edu.java.service.domain.Link;
 import java.util.List;
+import edu.java.repository.dto.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -21,7 +21,7 @@ public class TrackerBotClientImpl implements TrackerBotClient {
         webClient
             .post()
             .uri("/updates")
-            .bodyValue(new LinkUpdateRequest(link.getId(), link.getUrl(), description, chatIds))
+            .bodyValue(new LinkUpdateRequest(link.id(), link.url(), description, chatIds))
             .retrieve()
             .onStatus(HttpStatus.BAD_REQUEST::isSameCodeAs, clientResponse ->
                 clientResponse.bodyToMono(ApiErrorResponse.class)

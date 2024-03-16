@@ -13,7 +13,7 @@ import java.util.List;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class JdbcBaseRepositoryTest extends IntegrationTest {
+public abstract class JdbcBaseRepositoryTest extends IntegrationTest {
     @Autowired
     private DataSource dataSource;
 
@@ -66,7 +66,7 @@ public class JdbcBaseRepositoryTest extends IntegrationTest {
             jdbcTemplate.update("DELETE FROM chat WHERE id = ?", chat.id());
         });
         links.forEach(link -> {
-            jdbcTemplate.update("DELETE FROM link WHERE url = ?");
+            jdbcTemplate.update("DELETE FROM link WHERE url = ?", link);
         });
     }
 }

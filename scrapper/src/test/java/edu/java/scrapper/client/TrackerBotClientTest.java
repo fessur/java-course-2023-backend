@@ -4,9 +4,10 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.TrackerBotClient;
 import edu.java.client.exception.BadRequestException;
 import edu.java.client.implementation.TrackerBotClientImpl;
-import edu.java.service.domain.Link;
+import edu.java.repository.dto.Link;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.time.OffsetDateTime;
 import java.util.List;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.*;
@@ -26,7 +27,8 @@ public class TrackerBotClientTest {
         Link link = new Link(
             10,
             "https://stackoverflow.com/questions/41609436/powermock-after-log4j2-3-upgrade-could-not-reconfigure-jmx-java-lang-linkageerro",
-            "stackoverflow.com"
+            OffsetDateTime.now(),
+            OffsetDateTime.now()
         );
         String description = "New answer appeared!";
         List<Long> chatIds = List.of(123456789L);
@@ -43,7 +45,8 @@ public class TrackerBotClientTest {
         Link link = new Link(
             10,
             "not-a-valid-link",
-            "not-a-valid-domain"
+            OffsetDateTime.now(),
+            OffsetDateTime.now()
         );
         String description = "New answer appeared!";
         List<Long> chatIds = List.of(123456789L);
@@ -70,7 +73,7 @@ public class TrackerBotClientTest {
                     %d
                 ]
             }
-            """, link.getId(), link.getUrl(), description, chatIds.getFirst());
+            """, link.id(), link.url(), description, chatIds.getFirst());
     }
 
     private String createApiErrorResponseJson() {

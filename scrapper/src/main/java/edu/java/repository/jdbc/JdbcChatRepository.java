@@ -34,8 +34,8 @@ public class JdbcChatRepository implements ChatRepository {
     public void remove(long id) {
         jdbcTemplate.update("DELETE FROM chat_link WHERE chat_id = ?", id);
         jdbcTemplate.update("DELETE FROM chat WHERE id = ?", id);
-        jdbcTemplate.update("DELETE FROM link WHERE id IN" +
-            "(SELECT id FROM link\n LEFT JOIN chat_link ON link.id = chat_link.link_id WHERE chat_link.link_id IS NULL)");
+        jdbcTemplate.update("DELETE FROM link WHERE NOT EXISTS" +
+            "(SELECT 1 FROM chat_link WHERE link.id = chat_link.link_id)");
     }
 
     @Override

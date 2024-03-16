@@ -2,6 +2,7 @@ package edu.java.scrapper.client;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.GithubClient;
+import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.dto.GithubRepositoryResponse;
 import edu.java.client.implementation.GithubClientImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -140,7 +141,7 @@ public class GithubClientTest {
                       "network_count": 51043,
                       "subscribers_count": 8334
                     }""")));
-        GithubRepositoryResponse response = githubClient.fetchRepository(owner, repository);
+        GithubRepositoryResponse response = githubClient.fetchRepository(new GithubRepositoryRequest(owner, repository));
 
         assertThat(response)
             .isNotNull()

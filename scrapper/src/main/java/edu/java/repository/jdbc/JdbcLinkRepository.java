@@ -30,8 +30,8 @@ public class JdbcLinkRepository implements LinkRepository {
     @Transactional
     public void remove(long linkId, long chatId) {
         jdbcTemplate.update("DELETE FROM chat_link WHERE chat_id = ? AND link_id = ?", chatId, linkId);
-        jdbcTemplate.update("DELETE FROM link WHERE id IN" +
-            "(SELECT id FROM link\n LEFT JOIN chat_link ON link.id = chat_link.link_id WHERE chat_link.link_id IS NULL)");
+        jdbcTemplate.update("DELETE FROM link WHERE NOT EXISTS" +
+            "(SELECT 1 FROM chat_link WHERE link.id = chat_link.link_id)");
     }
 
     @Override
@@ -55,5 +55,10 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public void makeConnected(long linkId, long chatId) {
         jdbcTemplate.update("INSERT INTO chat_link (chat_id, link_id) VALUES (?, ?)", chatId, linkId);
+    }
+
+    @Override
+    public Collection<Link> findAll() {
+        return jdbcTemplate.query("SELECT * FROM link", LINK_MAPPER);
     }
 }
