@@ -1,22 +1,24 @@
 package edu.java.client.implementation;
 
 import edu.java.client.StackOverflowClient;
+import edu.java.client.dto.StackOverflowPostInnerResponse;
 import edu.java.client.dto.StackOverflowPostResponse;
+import java.util.Optional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import java.util.Optional;
 
 public class StackOverflowClientImpl implements StackOverflowClient {
     private final WebClient webClient;
+    private static final String URI_PATTERN = "/posts/{postId}?site=stackoverflow&filter=!nNPvSNOTRz";
 
     public StackOverflowClientImpl(String baseUrl) {
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
     }
 
     @Override
-    public Optional<StackOverflowPostResponse> fetchPost(long postId) {
-        return webClient.get()
-            .uri("/posts/{postId}?site=stackoverflow&filter=!nNPvSNOTRz", postId)
+    public Optional<StackOverflowPostInnerResponse> fetchPost(long postId) {
+        Optional<StackOverflowPostResponse> resp = webClient.get()
+            .uri(URI_PATTERN, postId)
             .exchangeToMono(response -> {
                 if (response.statusCode().is4xxClientError()) {
                     return Mono.just(Optional.<StackOverflowPostResponse>empty());
@@ -24,12 +26,16 @@ public class StackOverflowClientImpl implements StackOverflowClient {
                 return response.bodyToMono(StackOverflowPostResponse.class).flatMap(r -> Mono.just(Optional.of(r)));
             })
             .block();
+        if (resp.isEmpty() || resp.isPresent() && resp.get().items().isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(resp.get().items().getFirst());
     }
 
     @Override
     public boolean exists(long postId) {
         return Boolean.TRUE.equals(webClient.get()
-            .uri("/posts/{postId}?site=stackoverflow&filter=!nNPvSNOTRz", postId)
+            .uri(URI_PATTERN, postId)
             .retrieve()
             .bodyToMono(StackOverflowPostResponse.class)
             .flatMap(response -> {

@@ -1,10 +1,10 @@
 package edu.java.repository.jdbc.mapper;
 
-import edu.java.repository.dto.Chat;
-import org.springframework.jdbc.core.RowMapper;
+import edu.java.service.domain.Chat;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import org.springframework.jdbc.core.RowMapper;
 
 public class ChatMapper implements RowMapper<Chat> {
     @Override

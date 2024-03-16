@@ -1,15 +1,15 @@
 package edu.java.repository.jdbc;
 
 import edu.java.repository.LinkRepository;
-import edu.java.repository.dto.Link;
 import edu.java.repository.jdbc.mapper.LinkMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-import javax.sql.DataSource;
+import edu.java.service.domain.Link;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Optional;
+import javax.sql.DataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class JdbcLinkRepository implements LinkRepository {
@@ -35,8 +35,8 @@ public class JdbcLinkRepository implements LinkRepository {
     @Transactional
     public void remove(long linkId, long chatId) {
         jdbcTemplate.update("DELETE FROM chat_link WHERE chat_id = ? AND link_id = ?", chatId, linkId);
-        jdbcTemplate.update("DELETE FROM link WHERE NOT EXISTS" +
-            "(SELECT 1 FROM chat_link WHERE link.id = chat_link.link_id)");
+        jdbcTemplate.update("DELETE FROM link WHERE NOT EXISTS"
+            + "(SELECT 1 FROM chat_link WHERE link.id = chat_link.link_id)");
     }
 
     @Override
@@ -79,9 +79,10 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public Collection<Link> findOldest(Duration duration) {
-        String sql = "SELECT * FROM link WHERE last_check_time < CURRENT_TIMESTAMP - INTERVAL '" + duration.getSeconds() + " seconds'";
+        String query = "SELECT * FROM link WHERE "
+            + "last_check_time < CURRENT_TIMESTAMP - INTERVAL '" + duration.getSeconds() + " SECONDS'";
         return jdbcTemplate.query(
-            sql,
+            query,
             LINK_MAPPER
         );
     }

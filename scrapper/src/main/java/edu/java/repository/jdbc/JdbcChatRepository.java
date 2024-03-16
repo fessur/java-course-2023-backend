@@ -1,14 +1,14 @@
 package edu.java.repository.jdbc;
 
 import edu.java.repository.ChatRepository;
-import edu.java.repository.dto.Chat;
 import edu.java.repository.jdbc.mapper.ChatMapper;
+import edu.java.service.domain.Chat;
+import java.util.Collection;
+import java.util.Optional;
+import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import javax.sql.DataSource;
-import java.util.Collection;
-import java.util.Optional;
 
 @Repository
 public class JdbcChatRepository implements ChatRepository {
@@ -34,8 +34,8 @@ public class JdbcChatRepository implements ChatRepository {
     public void remove(long id) {
         jdbcTemplate.update("DELETE FROM chat_link WHERE chat_id = ?", id);
         jdbcTemplate.update("DELETE FROM chat WHERE id = ?", id);
-        jdbcTemplate.update("DELETE FROM link WHERE NOT EXISTS" +
-            "(SELECT 1 FROM chat_link WHERE link.id = chat_link.link_id)");
+        jdbcTemplate.update("DELETE FROM link WHERE NOT EXISTS"
+            + "(SELECT 1 FROM chat_link WHERE link.id = chat_link.link_id)");
     }
 
     @Override

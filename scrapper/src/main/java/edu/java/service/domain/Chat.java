@@ -1,4 +1,4 @@
-package edu.java.repository.dto;
+package edu.java.service.domain;
 
 import java.time.OffsetDateTime;
 

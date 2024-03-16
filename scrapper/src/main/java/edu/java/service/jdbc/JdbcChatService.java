@@ -1,8 +1,8 @@
 package edu.java.service.jdbc;
 
 import edu.java.repository.ChatRepository;
-import edu.java.repository.dto.Chat;
 import edu.java.service.ChatService;
+import edu.java.service.domain.Chat;
 import edu.java.service.exception.ChatAlreadyRegisteredException;
 import edu.java.service.exception.NoSuchChatException;
 import org.springframework.stereotype.Service;

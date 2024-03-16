@@ -19,11 +19,11 @@ public abstract class JdbcBaseDatabaseTest extends IntegrationTest {
 
     protected JdbcTemplate jdbcTemplate;
     protected final List<String> links = List.of(
-        "https://stackoverflow.com/questions/927358/how-do-i-undo-the-most-recent-local-commits-in-git",
-        "https://stackoverflow.com/questions/2003505/how-do-i-delete-a-git-branch-locally-and-remotely",
-        "https://stackoverflow.com/questions/292357/what-is-the-difference-between-git-pull-and-git-fetch",
-        "https://stackoverflow.com/questions/477816/which-json-content-type-do-i-use",
-        "https://stackoverflow.com/questions/348170/how-do-i-undo-git-add-before-commit",
+        "https://stackoverflow.com/questions/927358",
+        "https://stackoverflow.com/questions/2003505",
+        "https://stackoverflow.com/questions/292357",
+        "https://stackoverflow.com/questions/477816",
+        "https://stackoverflow.com/questions/348170",
         "https://github.com/spring-projects/spring-framework",
         "https://github.com/hibernate/hibernate-orm"
     );

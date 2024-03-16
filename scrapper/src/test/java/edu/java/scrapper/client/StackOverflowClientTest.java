@@ -21,9 +21,50 @@ public class StackOverflowClientTest {
     }
 
     @Test
-    public void testFetchPost() {
+    public void testFetchPostSuccess() {
         final long postId = 8318911;
 
+        setOkStub(postId);
+
+        assertThat(stackOverflowClient.fetchPost(postId))
+            .isPresent()
+            .hasValueSatisfying(response ->
+                assertThat(response)
+                    .extracting(
+                        StackOverflowPostInnerResponse::id,
+                        StackOverflowPostInnerResponse::title,
+                        StackOverflowPostInnerResponse::lastActivityDate
+                    )
+                    .containsExactly(
+                        postId,
+                        "Why does HTML think “chucknorris” is a color?",
+                        OffsetDateTime.parse("2024-01-24T02:40:12Z")
+                    )
+            );
+    }
+
+    @Test
+    public void testFetchPostFailed() {
+        final long postId = 1;
+        setEmptyStub(postId);
+        assertThat(stackOverflowClient.fetchPost(postId)).isEmpty();
+    }
+
+    @Test
+    public void testExistsSuccess() {
+        final long postId = 8318911;
+        setOkStub(postId);
+        assertThat(stackOverflowClient.exists(postId)).isTrue();
+    }
+
+    @Test
+    public void testNotExists() {
+        final long postId = 1;
+        setEmptyStub(postId);
+        assertThat(stackOverflowClient.exists(postId)).isFalse();
+    }
+
+    private void setOkStub(long postId) {
         stubFor(get(String.format("/posts/%d?site=stackoverflow&filter=!nNPvSNOTRz", postId))
             .willReturn(ok()
                 .withHeader("Content-Type", "application/json")
@@ -56,22 +97,19 @@ public class StackOverflowClientTest {
                       "quota_max": 10000,
                       "quota_remaining": 9926
                     }""")));
+    }
 
-        assertThat(stackOverflowClient.fetchPost(postId))
-            .isPresent()
-            .hasValueSatisfying(response ->
-                assertThat(response)
-                    .extracting(
-                        resp -> resp.items().getFirst())
-                    .extracting(
-                        StackOverflowPostInnerResponse::id,
-                        StackOverflowPostInnerResponse::title,
-                        StackOverflowPostInnerResponse::lastActivityDate
-                    )
-                    .containsExactly(
-                        postId,
-                        "Why does HTML think “chucknorris” is a color?",
-                        OffsetDateTime.parse("2024-01-24T02:40:12Z"))
-            );
+    private void setEmptyStub(long postId) {
+        stubFor(get(String.format("/posts/%d?site=stackoverflow&filter=!nNPvSNOTRz", postId))
+            .willReturn(ok()
+                .withHeader("Content-Type", "application/json")
+                .withBody("""
+                    {
+                      "items": [],
+                      "has_more": false,
+                      "quota_max": 10000,
+                      "quota_remaining": 9953
+                    }
+                    """)));
     }
 }

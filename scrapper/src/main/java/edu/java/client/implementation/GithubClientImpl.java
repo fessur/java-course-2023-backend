@@ -3,12 +3,13 @@ package edu.java.client.implementation;
 import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.dto.GithubRepositoryResponse;
+import java.util.Optional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import java.util.Optional;
 
 public class GithubClientImpl implements GithubClient {
     private final WebClient webClient;
+    private final static String URI_PATTERN = "/repos/{owner}/{repo}";
 
     public GithubClientImpl(String baseUrl) {
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
@@ -17,7 +18,7 @@ public class GithubClientImpl implements GithubClient {
     @Override
     public Optional<GithubRepositoryResponse> fetchRepository(GithubRepositoryRequest request) {
         return webClient.get()
-            .uri("/repos/{owner}/{repo}", request.owner(), request.repo())
+            .uri(URI_PATTERN, request.owner(), request.repo())
             .exchangeToMono(response -> {
                 if (response.statusCode().is4xxClientError()) {
                     return Mono.just(Optional.<GithubRepositoryResponse>empty());
@@ -30,7 +31,7 @@ public class GithubClientImpl implements GithubClient {
     @Override
     public boolean exists(GithubRepositoryRequest request) {
         return Boolean.TRUE.equals(webClient.get()
-            .uri("/repos/{owner}/{repo}", request.owner(), request.repo())
+            .uri(URI_PATTERN, request.owner(), request.repo())
             .exchangeToMono(response -> {
                 if (response.statusCode().is4xxClientError()) {
                     return Mono.just(false);

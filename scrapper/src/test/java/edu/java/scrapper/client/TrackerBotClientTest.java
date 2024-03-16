@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.TrackerBotClient;
 import edu.java.client.exception.BadRequestException;
 import edu.java.client.implementation.TrackerBotClientImpl;
-import edu.java.repository.dto.Link;
+import edu.java.service.domain.Link;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;

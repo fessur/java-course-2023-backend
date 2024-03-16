@@ -1,22 +1,24 @@
 package edu.java.scrapper.database.jdbc;
 
-import edu.java.repository.ChatRepository;
-import edu.java.service.domain.Chat;
+import edu.java.service.ChatService;
+import edu.java.service.exception.ChatAlreadyRegisteredException;
+import edu.java.service.exception.NoSuchChatException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class JdbcChatRepositoryTest extends JdbcBaseDatabaseTest {
+public class JdbcChatServiceTest extends JdbcBaseDatabaseTest {
     @Autowired
-    private ChatRepository chatRepository;
+    private ChatService chatService;
 
     @Test
     @Transactional
     @Rollback
-    public void addTest() {
-        chatRepository.add(new Chat(6, null));
+    public void testRegister() {
+        chatService.register(6);
         assertThat(jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM chat WHERE id = 6",
             Integer.class
@@ -26,8 +28,15 @@ public class JdbcChatRepositoryTest extends JdbcBaseDatabaseTest {
     @Test
     @Transactional
     @Rollback
-    public void removeTest() {
-        chatRepository.remove(4);
+    public void testAlreadyRegistered() {
+        assertThatExceptionOfType(ChatAlreadyRegisteredException.class).isThrownBy(() -> chatService.register(1));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testUnregister() {
+        chatService.unregister(4);
         assertThat(jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM chat WHERE id = 4",
             Integer.class
@@ -41,9 +50,7 @@ public class JdbcChatRepositoryTest extends JdbcBaseDatabaseTest {
     @Test
     @Transactional
     @Rollback
-    public void findTest() {
-        assertThat(chatRepository.findById(1)).isPresent()
-            .hasValueSatisfying(chat -> assertThat(chat).extracting(Chat::id).isEqualTo(1L));
-        assertThat(chatRepository.findById(6)).isEmpty();
+    public void testNotRegistered() {
+        assertThatExceptionOfType(NoSuchChatException.class).isThrownBy(() -> chatService.unregister(6));
     }
 }

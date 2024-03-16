@@ -1,7 +1,7 @@
 package edu.java.scrapper.database.jdbc;
 
 import edu.java.repository.LinkRepository;
-import edu.java.repository.dto.Link;
+import edu.java.service.domain.Link;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -124,11 +124,16 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Transactional
     @Rollback
     public void findOldestTest() {
+        List<String> urls = List.of("https://github.com/fessur/java-course-2023-backend",
+            "https://github.com/dotnet/aspnetcore",
+            "https://github.com/lobehub/lobe-chat",
+            "https://github.com/lavague-ai/LaVague"
+        );
         List.of(
-            new Link(-1, "url1", OffsetDateTime.now().minusHours(10), OffsetDateTime.now()),
-            new Link(-1, "url2", OffsetDateTime.now().minusHours(7), OffsetDateTime.now()),
-            new Link(-1, "url3", OffsetDateTime.now().minusHours(5), OffsetDateTime.now()),
-            new Link(-1, "url4", OffsetDateTime.now().minusHours(2), OffsetDateTime.now())
+            new Link(-1, urls.get(0), OffsetDateTime.now().minusHours(10), OffsetDateTime.now()),
+            new Link(-1, urls.get(1), OffsetDateTime.now().minusHours(7), OffsetDateTime.now()),
+            new Link(-1, urls.get(2), OffsetDateTime.now().minusHours(5), OffsetDateTime.now()),
+            new Link(-1, urls.get(3), OffsetDateTime.now().minusHours(2), OffsetDateTime.now())
         ).forEach(link -> {
             jdbcTemplate.update(
                 "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
@@ -139,6 +144,6 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
         });
 
         assertThat(linkRepository.findOldest(Duration.ofHours(4))).extracting(Link::url)
-            .containsExactlyInAnyOrder("url1", "url2", "url3");
+            .containsExactlyInAnyOrder(urls.get(0), urls.get(1), urls.get(2));
     }
 }

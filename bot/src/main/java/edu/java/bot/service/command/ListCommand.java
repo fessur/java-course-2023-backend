@@ -43,7 +43,10 @@ public class ListCommand extends Command {
                     + CommonUtils.joinEnumerated(links.links().stream().map(LinkResponse::url).toList(), 1)
             );
         } catch (NotFoundException ex) {
-            return new SendMessage(update.message().chat().id(), "You are not registered yet. Send /start to register.");
+            return new SendMessage(
+                update.message().chat().id(),
+                "You are not registered yet. Send /start to register."
+            );
         }
     }
 }
