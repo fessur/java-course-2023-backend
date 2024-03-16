@@ -49,7 +49,7 @@ public class UpdatesController {
                     Integer.toString(HttpStatus.BAD_REQUEST.value())
                 ));
         }
-        botService.sendMessages(request.getTgChatIds(), request.getUrl(), request.getDescription());
+        botService.sendMessages(request.tgChatIds(), request.url(), request.description());
         return ResponseEntity.ok().build();
     }
 }

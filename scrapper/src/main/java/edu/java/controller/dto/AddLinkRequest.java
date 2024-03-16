@@ -5,9 +5,5 @@ import lombok.Getter;
 import lombok.Setter;
 import java.net.URL;
 
-@Getter
-@Setter
-public class AddLinkRequest {
-    @SupportedLink
-    private String link;
+public record AddLinkRequest(@SupportedLink String link) {
 }

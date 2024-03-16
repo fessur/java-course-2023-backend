@@ -83,7 +83,7 @@ public class LinksController {
         if (bindingResult.hasErrors()) {
             return createBadRequestResponse(bindingResult);
         }
-        Link addedLink = linkService.add(addLinkRequest.getLink(), chatId);
+        Link addedLink = linkService.add(addLinkRequest.link(), chatId);
         return ResponseEntity.ok().body(new LinkResponse(addedLink.id(), addedLink.url()));
     }
 

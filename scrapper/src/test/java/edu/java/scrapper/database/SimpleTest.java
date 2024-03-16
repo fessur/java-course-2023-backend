@@ -1,8 +1,6 @@
-package edu.java.scrapper;
+package edu.java.scrapper.database;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class SimpleTest extends IntegrationTest {
     @Test
     public void testTablesExist() throws Exception {
