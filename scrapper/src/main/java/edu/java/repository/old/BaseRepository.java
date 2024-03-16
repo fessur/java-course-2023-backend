@@ -1,4 +1,4 @@
-package edu.java.repository;
+package edu.java.repository.old;
 
 import com.google.gson.Gson;
 import edu.java.configuration.ApplicationConfig;
