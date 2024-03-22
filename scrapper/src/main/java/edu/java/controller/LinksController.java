@@ -6,7 +6,7 @@ import edu.java.controller.dto.LinkResponse;
 import edu.java.controller.dto.ListLinksResponse;
 import edu.java.controller.dto.RemoveLinkRequest;
 import edu.java.service.LinkService;
-import edu.java.service.domain.Link;
+import edu.java.service.model.Link;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -51,7 +51,7 @@ public class LinksController {
     })
     public ResponseEntity<ListLinksResponse> getLinks(@RequestHeader("Tg-Chat-Id") long chatId) {
         List<LinkResponse> links = linkService.listAll(chatId).stream().map(link -> new LinkResponse(
-            link.id(), link.url())).toList();
+            link.getId(), link.getUrl())).toList();
         return ResponseEntity.ok().body(new ListLinksResponse(links, links.size()));
     }
 
@@ -84,7 +84,7 @@ public class LinksController {
             return createBadRequestResponse(bindingResult);
         }
         Link addedLink = linkService.add(addLinkRequest.link(), chatId);
-        return ResponseEntity.ok().body(new LinkResponse(addedLink.id(), addedLink.url()));
+        return ResponseEntity.ok().body(new LinkResponse(addedLink.getId(), addedLink.getUrl()));
     }
 
     @DeleteMapping
@@ -116,7 +116,7 @@ public class LinksController {
             return createBadRequestResponse(bindingResult);
         }
         Link deleted = linkService.remove(removeLinkRequest.link(), chatId);
-        return ResponseEntity.ok().body(new LinkResponse(deleted.id(), deleted.url()));
+        return ResponseEntity.ok().body(new LinkResponse(deleted.getId(), deleted.getUrl()));
     }
 
     private ResponseEntity<ApiErrorResponse> createBadRequestResponse(BindingResult bindingResult) {

@@ -4,7 +4,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.TrackerBotClient;
 import edu.java.client.exception.BadRequestException;
 import edu.java.client.implementation.TrackerBotClientImpl;
-import edu.java.service.domain.Link;
+import edu.java.service.model.Link;
+import edu.java.service.model.jdbc.JdbcLink;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
@@ -24,7 +25,7 @@ public class TrackerBotClientTest {
 
     @Test
     public void testSendUpdates() {
-        Link link = new Link(
+        Link link = new JdbcLink(
             10,
             "https://stackoverflow.com/questions/41609436/powermock-after-log4j2-3-upgrade-could-not-reconfigure-jmx-java-lang-linkageerro",
             OffsetDateTime.now(),
@@ -42,7 +43,7 @@ public class TrackerBotClientTest {
 
     @Test
     public void testInvalidUpdate() {
-        Link link = new Link(
+        Link link = new JdbcLink(
             10,
             "not-a-valid-link",
             OffsetDateTime.now(),
@@ -73,7 +74,7 @@ public class TrackerBotClientTest {
                     %d
                 ]
             }
-            """, link.id(), link.url(), description, chatIds.getFirst());
+            """, link.getId(), link.getUrl(), description, chatIds.getFirst());
     }
 
     private String createApiErrorResponseJson() {

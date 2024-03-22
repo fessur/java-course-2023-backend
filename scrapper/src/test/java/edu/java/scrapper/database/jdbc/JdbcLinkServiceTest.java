@@ -1,6 +1,6 @@
 package edu.java.scrapper.database.jdbc;
 
-import edu.java.service.domain.Link;
+import edu.java.service.model.Link;
 import edu.java.service.LinkService;
 import edu.java.service.exception.LinkAlreadyTrackingException;
 import edu.java.service.exception.NoSuchChatException;
@@ -23,7 +23,7 @@ public class JdbcLinkServiceTest extends JdbcBaseDatabaseTest {
         String link = "https://github.com/tiangolo/full-stack-fastapi-template/blob/master/.github/FUNDING.yml";
         String normalized = "https://github.com/tiangolo/full-stack-fastapi-template";
 
-        assertThat(linkService.add(link, 1)).extracting(Link::url).isEqualTo(normalized);
+        assertThat(linkService.add(link, 1)).extracting(Link::getUrl).isEqualTo(normalized);
 
         assertThat(jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM link WHERE url = ?",
@@ -62,11 +62,11 @@ public class JdbcLinkServiceTest extends JdbcBaseDatabaseTest {
     @Rollback
     public void removeSuccessTest() {
         Link link = linkService.remove(links.get(6), 4);
-        assertThat(link.url()).isEqualTo(links.get(6));
+        assertThat(link.getUrl()).isEqualTo(links.get(6));
         assertThat(jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM chat_link WHERE chat_id = 4 AND link_id = ?",
             Integer.class,
-            link.id()
+            link.getId()
         )).isEqualTo(0);
         assertThat(jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM link WHERE url = ?",
@@ -93,7 +93,7 @@ public class JdbcLinkServiceTest extends JdbcBaseDatabaseTest {
     @Transactional
     @Rollback
     public void listAllTest() {
-        assertThat(linkService.listAll(1)).extracting(Link::url)
+        assertThat(linkService.listAll(1)).extracting(Link::getUrl)
             .containsExactlyInAnyOrder(links.get(0), links.get(1), links.get(2));
         assertThat(linkService.listAll(5)).isEmpty();
     }

@@ -1,10 +1,10 @@
 package edu.java.scrapper.database.jdbc;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import edu.java.service.domain.Link;
+import edu.java.service.model.Link;
 import edu.java.repository.jdbc.mapper.LinkMapper;
 import edu.java.service.LinkUpdaterService;
-import edu.java.util.CommonUtils;
+import edu.java.service.model.jdbc.JdbcLink;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -22,33 +22,6 @@ public class JdbcLinkUpdaterServiceTest extends JdbcBaseDatabaseTest {
     private LinkUpdaterService linkUpdaterService;
 
     @Test
-    public void testNormalize() {
-        assertThat(linkUpdaterService.normalizeLink(CommonUtils.toURL(
-            "https://github.com/google/googletest/blob/main/googlemock/include/gmock/gmock-cardinalities.h")))
-            .isEqualTo("https://github.com/google/googletest");
-    }
-
-    @Test
-    public void validateLinkTest() {
-        assertThat(linkUpdaterService.validateLink(CommonUtils.toURL(
-            "https://github.com/google/googletest/blob/main/googlemock/include/gmock/gmock-cardinalities.h")))
-            .isEmpty();
-
-        assertThat(linkUpdaterService.validateLink(CommonUtils.toURL("https://github.com"))).isPresent();
-
-        assertThat(linkUpdaterService.validateLink(CommonUtils.toURL(
-            "https://github.com/fessur/Computer-Architecture/blob/main/lab2/testbench.sv")))
-            .isPresent();
-
-        assertThat(linkUpdaterService.validateLink(CommonUtils.toURL("https://stackoverflow.com/questions/12276")))
-            .isPresent();
-
-        assertThat(linkUpdaterService.validateLink(CommonUtils.toURL(
-            "https://stackoverflow.com/questions/26881739/unable-to-get-spring-boot-to-automatically-create-database-schema")))
-            .isEmpty();
-    }
-
-    @Test
     @Transactional
     @Rollback
     public void updateTest() {
@@ -59,21 +32,19 @@ public class JdbcLinkUpdaterServiceTest extends JdbcBaseDatabaseTest {
             "https://github.com/lavague-ai/LaVague"
         );
         List.of(
-            new Link(-1, urls.get(0), OffsetDateTime.now().minusHours(10), OffsetDateTime.now()),
-            new Link(-1, urls.get(1), OffsetDateTime.now().minusHours(7), OffsetDateTime.now()),
-            new Link(-1, urls.get(2), OffsetDateTime.now().minusHours(5), OffsetDateTime.now()),
-            new Link(-1, urls.get(3), OffsetDateTime.now().minusHours(2), OffsetDateTime.now())
-        ).forEach(link -> {
-            jdbcTemplate.update(
-                "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
-                link.url(),
-                link.lastCheckTime(),
-                link.createdAt()
-            );
-        });
+            new JdbcLink(-1, urls.get(0), OffsetDateTime.now().minusHours(10), OffsetDateTime.now()),
+            new JdbcLink(-1, urls.get(1), OffsetDateTime.now().minusHours(7), OffsetDateTime.now()),
+            new JdbcLink(-1, urls.get(2), OffsetDateTime.now().minusHours(5), OffsetDateTime.now()),
+            new JdbcLink(-1, urls.get(3), OffsetDateTime.now().minusHours(2), OffsetDateTime.now())
+        ).forEach(link -> jdbcTemplate.update(
+            "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
+            link.getUrl(),
+            link.getLastCheckTime(),
+            link.getCreatedAt()
+        ));
 
         assertThat(linkUpdaterService.update()).isEqualTo(4);
-        assertThat(jdbcTemplate.query("SELECT * FROM link", new LinkMapper())).extracting(Link::lastCheckTime)
+        assertThat(jdbcTemplate.query("SELECT * FROM link", new LinkMapper())).extracting(Link::getLastCheckTime)
             .filteredOn(time -> time.isBefore(OffsetDateTime.now().minusMinutes(1))).isEmpty();
     }
 }

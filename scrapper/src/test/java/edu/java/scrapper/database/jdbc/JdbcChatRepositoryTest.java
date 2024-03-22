@@ -1,7 +1,8 @@
 package edu.java.scrapper.database.jdbc;
 
-import edu.java.repository.ChatRepository;
-import edu.java.service.domain.Chat;
+import edu.java.repository.jdbc.JdbcChatRepository;
+import edu.java.service.model.Chat;
+import edu.java.service.model.jdbc.JdbcChat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -10,13 +11,13 @@ import static org.assertj.core.api.Assertions.*;
 
 public class JdbcChatRepositoryTest extends JdbcBaseDatabaseTest {
     @Autowired
-    private ChatRepository chatRepository;
+    private JdbcChatRepository chatRepository;
 
     @Test
     @Transactional
     @Rollback
     public void addTest() {
-        chatRepository.add(new Chat(6, null));
+        chatRepository.add(new JdbcChat(6, null));
         assertThat(jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM chat WHERE id = 6",
             Integer.class
@@ -43,7 +44,7 @@ public class JdbcChatRepositoryTest extends JdbcBaseDatabaseTest {
     @Rollback
     public void findTest() {
         assertThat(chatRepository.findById(1)).isPresent()
-            .hasValueSatisfying(chat -> assertThat(chat).extracting(Chat::id).isEqualTo(1L));
+            .hasValueSatisfying(chat -> assertThat(chat).extracting(Chat::getId).isEqualTo(1L));
         assertThat(chatRepository.findById(6)).isEmpty();
     }
 }

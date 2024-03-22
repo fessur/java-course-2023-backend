@@ -1,7 +1,8 @@
 package edu.java.scrapper.database.jdbc;
 
-import edu.java.repository.LinkRepository;
-import edu.java.service.domain.Link;
+import edu.java.repository.jdbc.JdbcLinkRepository;
+import edu.java.service.model.Link;
+import edu.java.service.model.jdbc.JdbcLink;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
@@ -13,14 +14,14 @@ import static org.assertj.core.api.Assertions.*;
 
 public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Autowired
-    private LinkRepository linkRepository;
+    private JdbcLinkRepository linkRepository;
 
     @Test
     @Transactional
     @Rollback
     public void addTest() {
         String url = "https://github.com/golang/go";
-        linkRepository.add(new Link(-1, url, null, null), 1);
+        linkRepository.add(new JdbcLink(-1, url, null, null), 1);
 
         assertThat(jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM link WHERE url = ?",
@@ -39,7 +40,7 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Rollback
     public void findByURLTest() {
         assertThat(linkRepository.findByURL(links.getFirst())).isPresent()
-            .hasValueSatisfying(link -> assertThat(links.getFirst()).isEqualTo(link.url()));
+            .hasValueSatisfying(link -> assertThat(links.getFirst()).isEqualTo(link.getUrl()));
     }
 
     @Test
@@ -47,11 +48,11 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Rollback
     public void removeTest() {
         assertThat(linkRepository.findByURL(links.get(6))).isPresent().hasValueSatisfying(link -> {
-            linkRepository.remove(link.id(), 4);
+            linkRepository.remove(link.getId(), 4);
             assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM chat_link WHERE chat_id = 4 AND link_id = ?",
                 Integer.class,
-                link.id()
+                link.getId()
             )).isEqualTo(0);
             assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM link WHERE url = ?",
@@ -65,7 +66,7 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Transactional
     @Rollback
     public void findAllByChatIdTest() {
-        assertThat(linkRepository.findAllByChatId(1)).extracting(Link::url)
+        assertThat(linkRepository.findAllByChatId(1)).extracting(Link::getUrl)
             .containsExactlyInAnyOrder(links.get(0), links.get(1), links.get(2));
         assertThat(linkRepository.findAllByChatId(5)).isEmpty();
     }
@@ -75,7 +76,7 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Rollback
     public void checkConnectedTest() {
         assertThat(linkRepository.findByURL(links.getFirst())).isPresent()
-            .hasValueSatisfying(link -> assertThat(linkRepository.checkConnected(link.id(), 1)).isTrue());
+            .hasValueSatisfying(link -> assertThat(linkRepository.checkConnected(link.getId(), 1)).isTrue());
     }
 
     @Test
@@ -83,13 +84,13 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Rollback
     public void makeConnectedTest() {
         assertThat(linkRepository.findByURL(links.get(6))).isPresent().hasValueSatisfying(link -> {
-            linkRepository.makeConnected(link.id(), 1);
+            linkRepository.makeConnected(link.getId(), 1);
             assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM chat_link WHERE chat_id = 1 AND link_id = ?",
                 Integer.class,
-                link.id()
+                link.getId()
             )).isEqualTo(1);
-            assertThat(linkRepository.checkConnected(link.id(), 1)).isTrue();
+            assertThat(linkRepository.checkConnected(link.getId(), 1)).isTrue();
         });
     }
 
@@ -97,7 +98,7 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Transactional
     @Rollback
     public void findAllTest() {
-        assertThat(linkRepository.findAll()).extracting(Link::url)
+        assertThat(linkRepository.findAll()).extracting(Link::getUrl)
             .containsExactlyInAnyOrder(links.toArray(String[]::new));
     }
 
@@ -105,18 +106,17 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Transactional
     @Rollback
     public void updateTest() {
-        Link newLink = new Link(-1, "url", OffsetDateTime.now().minusHours(10), OffsetDateTime.now());
+        JdbcLink newLink = new JdbcLink(-1, "url", OffsetDateTime.now().minusHours(10), OffsetDateTime.now());
         jdbcTemplate.update(
             "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
-            newLink.url(),
-            newLink.lastCheckTime(),
-            newLink.createdAt()
+            newLink.getUrl(),
+            newLink.getLastCheckTime(),
+            newLink.getCreatedAt()
         );
         assertThat(linkRepository.findByURL("url")).isPresent().hasValueSatisfying(link -> {
-            linkRepository.updateLastCheckTime(link.id());
-            assertThat(linkRepository.findByURL("url")).isPresent().hasValueSatisfying(l -> {
-                assertThat(l.lastCheckTime()).isAfter(newLink.lastCheckTime());
-            });
+            linkRepository.updateLastCheckTime(link.getId());
+            assertThat(linkRepository.findByURL("url")).isPresent()
+                .hasValueSatisfying(l -> assertThat(l.getLastCheckTime()).isAfter(newLink.getLastCheckTime()));
         });
     }
 
@@ -124,26 +124,25 @@ public class JdbcLinkRepositoryTest extends JdbcBaseDatabaseTest {
     @Transactional
     @Rollback
     public void findOldestTest() {
-        List<String> urls = List.of("https://github.com/fessur/java-course-2023-backend",
+        List<String> urls = List.of(
+            "https://github.com/fessur/java-course-2023-backend",
             "https://github.com/dotnet/aspnetcore",
             "https://github.com/lobehub/lobe-chat",
             "https://github.com/lavague-ai/LaVague"
         );
         List.of(
-            new Link(-1, urls.get(0), OffsetDateTime.now().minusHours(10), OffsetDateTime.now()),
-            new Link(-1, urls.get(1), OffsetDateTime.now().minusHours(7), OffsetDateTime.now()),
-            new Link(-1, urls.get(2), OffsetDateTime.now().minusHours(5), OffsetDateTime.now()),
-            new Link(-1, urls.get(3), OffsetDateTime.now().minusHours(2), OffsetDateTime.now())
-        ).forEach(link -> {
-            jdbcTemplate.update(
-                "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
-                link.url(),
-                link.lastCheckTime(),
-                link.createdAt()
-            );
-        });
+            new JdbcLink(-1, urls.get(0), OffsetDateTime.now().minusHours(10), OffsetDateTime.now()),
+            new JdbcLink(-1, urls.get(1), OffsetDateTime.now().minusHours(7), OffsetDateTime.now()),
+            new JdbcLink(-1, urls.get(2), OffsetDateTime.now().minusHours(5), OffsetDateTime.now()),
+            new JdbcLink(-1, urls.get(3), OffsetDateTime.now().minusHours(2), OffsetDateTime.now())
+        ).forEach(link -> jdbcTemplate.update(
+            "INSERT INTO link (url, last_check_time, created_at) VALUES (?, ?, ?)",
+            link.getUrl(),
+            link.getLastCheckTime(),
+            link.getCreatedAt()
+        ));
 
-        assertThat(linkRepository.findOldest(Duration.ofHours(4))).extracting(Link::url)
+        assertThat(linkRepository.findOldest(Duration.ofHours(4))).extracting(Link::getUrl)
             .containsExactlyInAnyOrder(urls.get(0), urls.get(1), urls.get(2));
     }
 }
