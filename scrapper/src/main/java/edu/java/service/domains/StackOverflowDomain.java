@@ -1,6 +1,7 @@
 package edu.java.service.domains;
 
 import edu.java.client.StackOverflowClient;
+import edu.java.client.dto.StackOverflowPostInnerResponse;
 import java.net.URL;
 
 public abstract class StackOverflowDomain implements Domain {
@@ -52,5 +53,9 @@ public abstract class StackOverflowDomain implements Domain {
 
     protected long toStackOverflowQuestion(URL url) {
         return Long.parseLong(url.getPath().split("/")[2]);
+    }
+
+    protected String createDescription(StackOverflowPostInnerResponse response) {
+        return "Question " + response.title();
     }
 }

@@ -2,6 +2,7 @@ package edu.java.service.jpa;
 
 import edu.java.repository.jpa.JpaChatRepository;
 import edu.java.repository.jpa.JpaLinkRepository;
+import edu.java.service.ChatService;
 import edu.java.service.DomainService;
 import edu.java.service.LinkService;
 import edu.java.service.exception.LinkAlreadyTrackingException;
@@ -33,9 +34,10 @@ public class JpaLinkService implements LinkService {
     public JpaLink add(String url, long chatId) {
         String normalized = domainService.normalizeLink(CommonUtils.toURL(url));
         JpaChat chat =
-            chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(NOT_REGISTERED_MESSAGE));
+            chatRepository.findById(chatId)
+                .orElseThrow(() -> new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE));
         chat.getLinks().stream().filter(l -> l.getUrl().equals(normalized)).findFirst().ifPresent(l -> {
-            throw new LinkAlreadyTrackingException("Link is already tracking");
+            throw new LinkAlreadyTrackingException(ALREADY_TRACKING_MESSAGE);
         });
         JpaLink link = linkRepository.findByUrl(url).orElseGet(() -> {
             JpaLink newLink = new JpaLink();
@@ -52,10 +54,10 @@ public class JpaLinkService implements LinkService {
     public JpaLink remove(String url, long chatId) {
         String normalized = domainService.normalizeLink(CommonUtils.toURL(url));
         JpaChat chat = chatRepository.findById(chatId).orElseThrow(() ->
-            new NoSuchChatException(NOT_REGISTERED_MESSAGE)
+            new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE)
         );
         JpaLink link = chat.getLinks().stream().filter(l -> l.getUrl().equals(normalized)).findFirst()
-            .orElseThrow(() -> new NoSuchLinkException("You are not tracking this link"));
+            .orElseThrow(() -> new NoSuchLinkException(NOT_TRACKING_MESSAGE));
         chat.getLinks().remove(link);
         link.getChats().remove(chat);
         return link;
@@ -63,7 +65,8 @@ public class JpaLinkService implements LinkService {
 
     @Override
     public Collection<JpaLink> listAll(long chatId) {
-        return chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(NOT_REGISTERED_MESSAGE))
+        return chatRepository.findById(chatId)
+            .orElseThrow(() -> new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE))
             .getLinks();
     }
 }

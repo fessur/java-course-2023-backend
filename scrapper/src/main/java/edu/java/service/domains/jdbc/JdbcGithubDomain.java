@@ -31,7 +31,7 @@ public class JdbcGithubDomain extends GithubDomain implements JdbcDomain {
                 if (githubResponse.lastActivityDate().isAfter(link.getLastCheckTime())) {
                     trackerBotClient.sendUpdate(
                         link,
-                        "Repository " + githubResponse.name(),
+                        createDescription(githubResponse),
                         chatRepository.findAllByLink(link.getId()).stream().map(Chat::getId).toList()
                     );
                 }

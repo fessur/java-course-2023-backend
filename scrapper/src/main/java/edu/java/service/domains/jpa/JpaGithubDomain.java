@@ -24,7 +24,7 @@ public class JpaGithubDomain extends GithubDomain implements JpaDomain {
                 if (githubResponse.lastActivityDate().isAfter(link.getLastCheckTime())) {
                     trackerBotClient.sendUpdate(
                         link,
-                        "Repository " + githubResponse.name(),
+                        createDescription(githubResponse),
                         link.getChats().stream().map(JpaChat::getId).toList()
                     );
                 }

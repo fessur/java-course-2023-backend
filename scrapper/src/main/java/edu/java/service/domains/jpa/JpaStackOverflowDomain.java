@@ -25,7 +25,7 @@ public class JpaStackOverflowDomain extends StackOverflowDomain implements JpaDo
                     .isAfter(link.getLastCheckTime())) {
                     trackerBotClient.sendUpdate(
                         link,
-                        "Question " + stackOverflowResponse.title(),
+                        createDescription(stackOverflowResponse),
                         link.getChats().stream().map(JpaChat::getId).toList()
                     );
                 }

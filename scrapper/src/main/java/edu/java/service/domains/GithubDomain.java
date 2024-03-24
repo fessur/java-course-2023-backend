@@ -2,6 +2,7 @@ package edu.java.service.domains;
 
 import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
+import edu.java.client.dto.GithubRepositoryResponse;
 import java.net.URL;
 
 public abstract class GithubDomain implements Domain {
@@ -46,5 +47,9 @@ public abstract class GithubDomain implements Domain {
     protected GithubRepositoryRequest toGithubRepository(URL url) {
         String[] parts = url.getPath().split("/");
         return new GithubRepositoryRequest(parts[1], parts[2]);
+    }
+
+    protected String createDescription(GithubRepositoryResponse response) {
+        return "Repository " + response.name();
     }
 }

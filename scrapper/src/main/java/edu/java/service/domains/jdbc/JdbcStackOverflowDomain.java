@@ -32,7 +32,7 @@ public class JdbcStackOverflowDomain extends StackOverflowDomain implements Jdbc
                     .isAfter(link.getLastCheckTime())) {
                     trackerBotClient.sendUpdate(
                         link,
-                        "Question " + stackOverflowResponse.title(),
+                        createDescription(stackOverflowResponse),
                         chatRepository.findAllByLink(link.getId()).stream().map(Chat::getId).toList()
                     );
                 }
