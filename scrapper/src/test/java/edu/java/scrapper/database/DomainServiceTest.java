@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
-public class DomainServiceTest {
+public class DomainServiceTest extends IntegrationTest {
     @Autowired
     private DomainService domainService;
     @Test
