@@ -4,7 +4,7 @@ import edu.java.client.TrackerBotClient;
 import edu.java.client.dto.LinkUpdateRequest;
 import edu.java.client.exception.BadRequestException;
 import edu.java.controller.dto.ApiErrorResponse;
-import edu.java.service.domain.Link;
+import edu.java.service.model.Link;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;

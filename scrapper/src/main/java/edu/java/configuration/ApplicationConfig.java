@@ -15,10 +15,7 @@ public record ApplicationConfig(
     Scheduler scheduler,
 
     @NotNull
-    BaseUrl baseUrl,
-
-    @NotEmpty
-    String localDbPath
+    BaseUrl baseUrl
 ) {
     public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
     }
