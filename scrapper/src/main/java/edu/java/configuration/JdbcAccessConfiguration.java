@@ -68,8 +68,8 @@ public class JdbcAccessConfiguration {
     public LinkUpdaterService linkUpdaterService(
         JdbcLinkRepository linkRepository,
         ApplicationConfig applicationConfig,
-        List<JdbcSite> domains
+        List<JdbcSite> sites
     ) {
-        return new JdbcLinkUpdaterService(linkRepository, applicationConfig, domains);
+        return new JdbcLinkUpdaterService(linkRepository, applicationConfig, sites);
     }
 }
