@@ -5,9 +5,7 @@ import edu.java.service.ChatService;
 import edu.java.service.exception.ChatAlreadyRegisteredException;
 import edu.java.service.exception.NoSuchChatException;
 import edu.java.service.model.jdbc.JdbcChat;
-import org.springframework.stereotype.Service;
 
-@Service
 public class JdbcChatService implements ChatService {
     private final JdbcChatRepository chatRepository;
 

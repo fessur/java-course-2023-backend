@@ -8,10 +8,8 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-@Repository
 public class JdbcLinkRepositoryImpl implements JdbcLinkRepository {
     private static final LinkMapper LINK_MAPPER = new LinkMapper();
     private final JdbcTemplate jdbcTemplate;

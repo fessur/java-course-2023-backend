@@ -1,31 +1,23 @@
-package edu.java.service.domains.jdbc;
+package edu.java.service.domains.jpa;
 
 import edu.java.client.StackOverflowClient;
 import edu.java.client.TrackerBotClient;
-import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.service.domains.StackOverflowDomain;
-import edu.java.service.model.Chat;
-import edu.java.service.model.jdbc.JdbcLink;
+import edu.java.service.model.jpa.JpaChat;
+import edu.java.service.model.jpa.JpaLink;
 import edu.java.util.CommonUtils;
 import java.net.URL;
-import org.springframework.stereotype.Component;
 
-public class JdbcStackOverflowDomain extends StackOverflowDomain implements JdbcDomain {
+public class JpaStackOverflowDomain extends StackOverflowDomain implements JpaDomain {
     private final TrackerBotClient trackerBotClient;
-    private final JdbcChatRepository chatRepository;
 
-    public JdbcStackOverflowDomain(
-        TrackerBotClient trackerBotClient,
-        StackOverflowClient stackOverflowClient,
-        JdbcChatRepository chatRepository
-    ) {
+    public JpaStackOverflowDomain(StackOverflowClient stackOverflowClient, TrackerBotClient trackerBotClient) {
         super(stackOverflowClient);
         this.trackerBotClient = trackerBotClient;
-        this.chatRepository = chatRepository;
     }
 
     @Override
-    public void update(JdbcLink link) {
+    public void update(JpaLink link) {
         URL parsed = CommonUtils.toURL(link.getUrl());
         stackOverflowClient.fetchPost(toStackOverflowQuestion(parsed))
             .ifPresent(stackOverflowResponse -> {
@@ -34,7 +26,7 @@ public class JdbcStackOverflowDomain extends StackOverflowDomain implements Jdbc
                     trackerBotClient.sendUpdate(
                         link,
                         "Question " + stackOverflowResponse.title(),
-                        chatRepository.findAllByLink(link.getId()).stream().map(Chat::getId).toList()
+                        link.getChats().stream().map(JpaChat::getId).toList()
                     );
                 }
             });

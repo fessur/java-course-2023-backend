@@ -1,31 +1,23 @@
-package edu.java.service.domains.jdbc;
+package edu.java.service.domains.jpa;
 
 import edu.java.client.GithubClient;
 import edu.java.client.TrackerBotClient;
-import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.service.domains.GithubDomain;
-import edu.java.service.model.Chat;
-import edu.java.service.model.jdbc.JdbcLink;
+import edu.java.service.model.jpa.JpaChat;
+import edu.java.service.model.jpa.JpaLink;
 import edu.java.util.CommonUtils;
 import java.net.URL;
-import org.springframework.stereotype.Component;
 
-public class JdbcGithubDomain extends GithubDomain implements JdbcDomain {
+public class JpaGithubDomain extends GithubDomain implements JpaDomain {
     private final TrackerBotClient trackerBotClient;
-    private final JdbcChatRepository chatRepository;
 
-    public JdbcGithubDomain(
-        TrackerBotClient trackerBotClient,
-        GithubClient githubClient,
-        JdbcChatRepository chatRepository
-    ) {
+    public JpaGithubDomain(GithubClient githubClient, TrackerBotClient trackerBotClient) {
         super(githubClient);
         this.trackerBotClient = trackerBotClient;
-        this.chatRepository = chatRepository;
     }
 
     @Override
-    public void update(JdbcLink link) {
+    public void update(JpaLink link) {
         URL parsed = CommonUtils.toURL(link.getUrl());
         githubClient.fetchRepository(toGithubRepository(parsed))
             .ifPresent((githubResponse -> {
@@ -33,7 +25,7 @@ public class JdbcGithubDomain extends GithubDomain implements JdbcDomain {
                     trackerBotClient.sendUpdate(
                         link,
                         "Repository " + githubResponse.name(),
-                        chatRepository.findAllByLink(link.getId()).stream().map(Chat::getId).toList()
+                        link.getChats().stream().map(JpaChat::getId).toList()
                     );
                 }
             }));
