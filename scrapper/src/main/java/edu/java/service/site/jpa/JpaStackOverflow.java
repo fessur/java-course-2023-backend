@@ -25,7 +25,7 @@ public class JpaStackOverflow extends StackOverflow implements JpaSite {
                     .isAfter(link.getLastCheckTime())) {
                     trackerBotClient.sendUpdate(
                         link,
-                        "Question " + stackOverflowResponse.title(),
+                        createDescription(stackOverflowResponse),
                         link.getChats().stream().map(JpaChat::getId).toList()
                     );
                 }

@@ -16,7 +16,7 @@ public class JdbcChatService implements ChatService {
     @Override
     public void register(long chatId) {
         chatRepository.findById(chatId).ifPresentOrElse(c -> {
-            throw new ChatAlreadyRegisteredException("Chat is already registered");
+            throw new ChatAlreadyRegisteredException(ALREADY_REGISTERED_MESSAGE);
         }, () -> {
             JdbcChat chat = new JdbcChat(chatId, null);
             chatRepository.add(chat);
@@ -26,7 +26,7 @@ public class JdbcChatService implements ChatService {
     @Override
     public void unregister(long chatId) {
         chatRepository.findById(chatId).ifPresentOrElse(c -> chatRepository.remove(chatId), () -> {
-            throw new NoSuchChatException("Chat is not registered");
+            throw new NoSuchChatException(NOT_REGISTERED_MESSAGE);
         });
     }
 }

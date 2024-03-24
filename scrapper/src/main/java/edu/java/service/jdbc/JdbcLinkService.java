@@ -2,6 +2,7 @@ package edu.java.service.jdbc;
 
 import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.repository.jdbc.JdbcLinkRepository;
+import edu.java.service.ChatService;
 import edu.java.service.LinkService;
 import edu.java.service.SiteService;
 import edu.java.service.exception.LinkAlreadyTrackingException;
@@ -28,11 +29,11 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public JdbcLink add(String url, long chatId) {
-        chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(NOT_REGISTERED_MESSAGE));
+        chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE));
         String normalized = siteService.normalizeLink(CommonUtils.toURL(url));
         linkRepository.findByURL(normalized).ifPresentOrElse(link -> {
             if (linkRepository.checkConnected(link.getId(), chatId)) {
-                throw new LinkAlreadyTrackingException("Link is already tracking");
+                throw new LinkAlreadyTrackingException(ALREADY_TRACKING_MESSAGE);
             }
             linkRepository.makeConnected(link.getId(), chatId);
         }, () -> linkRepository.add(new JdbcLink(0, normalized, null, null), chatId));
@@ -41,12 +42,12 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public JdbcLink remove(String url, long chatId) {
-        chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(NOT_REGISTERED_MESSAGE));
+        chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE));
         String normalized = siteService.normalizeLink(CommonUtils.toURL(url));
         JdbcLink link =
-            linkRepository.findByURL(normalized).orElseThrow(() -> new NoSuchLinkException("Cannot find link"));
+            linkRepository.findByURL(normalized).orElseThrow(() -> new NoSuchLinkException(NOT_TRACKING_MESSAGE));
         if (!linkRepository.checkConnected(link.getId(), chatId)) {
-            throw new NoSuchLinkException("Link is not tracked by this chat");
+            throw new NoSuchLinkException(NOT_TRACKING_MESSAGE);
         }
         linkRepository.remove(link.getId(), chatId);
         return link;
@@ -54,7 +55,7 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public Collection<JdbcLink> listAll(long chatId) {
-        chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(NOT_REGISTERED_MESSAGE));
+        chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE));
         return linkRepository.findAllByChatId(chatId);
     }
 }

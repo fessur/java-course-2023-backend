@@ -18,7 +18,7 @@ public class JpaChatService implements ChatService {
     @Transactional
     public void register(long chatId) {
         chatRepository.findById(chatId).ifPresentOrElse(c -> {
-            throw new ChatAlreadyRegisteredException("Chat is already registered");
+            throw new ChatAlreadyRegisteredException(ALREADY_REGISTERED_MESSAGE);
         }, () -> {
             JpaChat chat = new JpaChat();
             chat.setId(chatId);
@@ -33,7 +33,7 @@ public class JpaChatService implements ChatService {
             c.getLinks().forEach(l -> l.getChats().remove(c));
             chatRepository.deleteById(chatId);
         }, () -> {
-            throw new NoSuchChatException("Chat is not registered");
+            throw new NoSuchChatException(NOT_REGISTERED_MESSAGE);
         });
     }
 }

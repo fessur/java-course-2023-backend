@@ -32,7 +32,7 @@ public class JdbcStackOverflow extends StackOverflow implements JdbcSite {
                     .isAfter(link.getLastCheckTime())) {
                     trackerBotClient.sendUpdate(
                         link,
-                        "Question " + stackOverflowResponse.title(),
+                        createDescription(stackOverflowResponse),
                         chatRepository.findAllByLink(link.getId()).stream().map(Chat::getId).toList()
                     );
                 }
