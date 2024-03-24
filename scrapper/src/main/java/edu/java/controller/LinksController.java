@@ -6,7 +6,7 @@ import edu.java.controller.dto.LinkResponse;
 import edu.java.controller.dto.ListLinksResponse;
 import edu.java.controller.dto.RemoveLinkRequest;
 import edu.java.service.LinkService;
-import edu.java.service.domain.Link;
+import edu.java.service.model.Link;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,8 +49,8 @@ public class LinksController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
-    public ResponseEntity<ListLinksResponse> getLinks(@RequestHeader("Tg-Chat-Id") long id) {
-        List<LinkResponse> links = linkService.findAll(id).stream().map(link -> new LinkResponse(
+    public ResponseEntity<ListLinksResponse> getLinks(@RequestHeader("Tg-Chat-Id") long chatId) {
+        List<LinkResponse> links = linkService.listAll(chatId).stream().map(link -> new LinkResponse(
             link.getId(), link.getUrl())).toList();
         return ResponseEntity.ok().body(new ListLinksResponse(links, links.size()));
     }
@@ -76,14 +76,14 @@ public class LinksController {
         })
     })
     public ResponseEntity<?> addLink(
-        @RequestHeader("Tg-Chat-Id") long id,
+        @RequestHeader("Tg-Chat-Id") long chatId,
         @Valid @RequestBody AddLinkRequest addLinkRequest,
         BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return createBadRequestResponse(bindingResult);
         }
-        Link addedLink = linkService.addLink(id, LinkService.parse(addLinkRequest.getLink()));
+        Link addedLink = linkService.add(addLinkRequest.link(), chatId);
         return ResponseEntity.ok().body(new LinkResponse(addedLink.getId(), addedLink.getUrl()));
     }
 
@@ -108,15 +108,14 @@ public class LinksController {
                      })
     })
     public ResponseEntity<?> deleteLink(
-        @RequestHeader("Tg-Chat-Id") long id,
+        @RequestHeader("Tg-Chat-Id") long chatId,
         @Valid @RequestBody RemoveLinkRequest removeLinkRequest,
         BindingResult bindingResult
     ) {
         if (bindingResult.hasErrors()) {
             return createBadRequestResponse(bindingResult);
         }
-        Link parsed = LinkService.parse(removeLinkRequest.link());
-        Link deleted = linkService.deleteLink(id, parsed);
+        Link deleted = linkService.remove(removeLinkRequest.link(), chatId);
         return ResponseEntity.ok().body(new LinkResponse(deleted.getId(), deleted.getUrl()));
     }
 

@@ -17,12 +17,16 @@ public record ApplicationConfig(
     @NotNull
     BaseUrl baseUrl,
 
-    @NotEmpty
-    String localDbPath
+    @NotNull
+    AccessType databaseAccessType
 ) {
     public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
     }
 
     public record BaseUrl(@NotEmpty String github, @NotEmpty String stackoverflow, @NotEmpty String trackerBot) {
+    }
+
+    public enum AccessType {
+        JDBC, JPA,
     }
 }

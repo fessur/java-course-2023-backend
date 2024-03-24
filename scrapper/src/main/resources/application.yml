@@ -2,15 +2,22 @@ app:
   scheduler:
     enable: true
     interval: 10s
-    force-check-delay: 10s
+    force-check-delay: 1m
   base-url:
     github: https://api.github.com
     stackoverflow: https://api.stackexchange.com/2.3
     tracker-bot: http://localhost:8090
+  database-access-type: jpa
 
 spring:
   application:
     name: scrapper
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/scrapper"
+    username: "postgres"
+    password: "postgres"
+  liquibase:
+    change-log: classpath:migrations/master.xml
 
 springdoc:
   swagger-ui:

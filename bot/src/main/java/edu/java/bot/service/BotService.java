@@ -14,7 +14,7 @@ public class BotService {
     }
 
     public void sendMessage(long chatId, String url, String description) {
-        bot.execute(new SendMessage(chatId, String.format("URL %s has new update! %s", url, description)));
+        bot.execute(new SendMessage(chatId, String.format("%s has new update!\n%s", description, url)));
     }
 
     public void sendMessages(List<Long> chatIds, String url, String description) {
