@@ -8,10 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-@Repository
 public class JdbcChatRepositoryImpl implements JdbcChatRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private static final ChatMapper CHAT_MAPPER = new ChatMapper();

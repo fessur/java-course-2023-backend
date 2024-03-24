@@ -1,24 +1,25 @@
-package edu.java.service.jdbc;
+package edu.java.service.jpa;
 
 import edu.java.configuration.ApplicationConfig;
-import edu.java.repository.jdbc.JdbcLinkRepository;
+import edu.java.repository.jpa.JpaLinkRepository;
 import edu.java.service.LinkUpdaterService;
-import edu.java.service.model.jdbc.JdbcLink;
-import edu.java.service.site.jdbc.JdbcSite;
+import edu.java.service.site.jpa.JpaDomain;
+import edu.java.service.model.jpa.JpaLink;
 import edu.java.util.CommonUtils;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
-public class JdbcLinkUpdaterService implements LinkUpdaterService {
-    private final JdbcLinkRepository linkRepository;
+public class JpaLinkUpdaterService implements LinkUpdaterService {
+    private final JpaLinkRepository linkRepository;
     private final ApplicationConfig applicationConfig;
-    private final List<JdbcSite> domains;
+    private final List<JpaDomain> domains;
 
-    public JdbcLinkUpdaterService(
-        JdbcLinkRepository linkRepository,
+    public JpaLinkUpdaterService(
+        JpaLinkRepository linkRepository,
         ApplicationConfig applicationConfig,
-        List<JdbcSite> domains
+        List<JpaDomain> domains
     ) {
         this.linkRepository = linkRepository;
         this.applicationConfig = applicationConfig;
@@ -28,8 +29,12 @@ public class JdbcLinkUpdaterService implements LinkUpdaterService {
     @Override
     @Transactional
     public int update() {
-        Collection<JdbcLink> oldest = linkRepository.findOldest(applicationConfig.scheduler().forceCheckDelay());
+        Collection<JpaLink> oldest =
+            linkRepository.findOldest(OffsetDateTime.now().minus(applicationConfig.scheduler().forceCheckDelay()));
         oldest.forEach(link -> {
+            if (link.getChats().isEmpty()) {
+                linkRepository.delete(link);
+            }
             linkRepository.updateLastCheckTime(link.getId());
             domains.stream().filter(d -> d.isValid(CommonUtils.toURL(link.getUrl()))).findFirst()
                 .ifPresent(d -> d.update(link));

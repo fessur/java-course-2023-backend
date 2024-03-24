@@ -5,7 +5,7 @@ import edu.java.client.dto.LinkUpdateRequest;
 import edu.java.client.exception.BadRequestException;
 import edu.java.controller.dto.ApiErrorResponse;
 import edu.java.service.model.Link;
-import java.util.List;
+import java.util.Collection;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -17,7 +17,7 @@ public class TrackerBotClientImpl implements TrackerBotClient {
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
     }
 
-    public void sendUpdate(Link link, String description, List<Long> chatIds) {
+    public void sendUpdate(Link link, String description, Collection<Long> chatIds) {
         webClient
             .post()
             .uri("/updates")

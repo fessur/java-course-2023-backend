@@ -10,11 +10,8 @@ import edu.java.service.exception.NoSuchLinkException;
 import edu.java.service.model.jdbc.JdbcLink;
 import edu.java.util.CommonUtils;
 import java.util.Collection;
-import org.springframework.stereotype.Service;
 
-@Service
 public class JdbcLinkService implements LinkService {
-    private static final String NOT_REGISTERED_MESSAGE = "Chat is not registered";
     private final JdbcChatRepository chatRepository;
     private final JdbcLinkRepository linkRepository;
     private final SiteService siteService;
