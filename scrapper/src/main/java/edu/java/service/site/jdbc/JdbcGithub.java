@@ -8,7 +8,6 @@ import edu.java.service.model.jdbc.JdbcLink;
 import edu.java.service.site.Github;
 import edu.java.util.CommonUtils;
 import java.net.URL;
-import org.springframework.stereotype.Component;
 
 public class JdbcGithub extends Github implements JdbcSite {
     private final TrackerBotClient trackerBotClient;

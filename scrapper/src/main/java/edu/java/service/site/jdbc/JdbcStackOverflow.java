@@ -8,7 +8,6 @@ import edu.java.service.model.jdbc.JdbcLink;
 import edu.java.service.site.StackOverflow;
 import edu.java.util.CommonUtils;
 import java.net.URL;
-import org.springframework.stereotype.Component;
 
 public class JdbcStackOverflow extends StackOverflow implements JdbcSite {
     private final TrackerBotClient trackerBotClient;
