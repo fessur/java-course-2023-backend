@@ -78,6 +78,6 @@ public class RetryTest {
             new ApplicationConfig.Github(
                 BASE_URL, retry
             ), null, null
-        ), null);
+        ), null, null);
     }
 }

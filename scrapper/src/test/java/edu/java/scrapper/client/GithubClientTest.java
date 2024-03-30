@@ -220,6 +220,6 @@ public class GithubClientTest {
                 BASE_URL,
                 new RetryBuilder(1, new int[] {500}).constant(0)
             ), null, null
-        ), null);
+        ), null, null);
     }
 }
