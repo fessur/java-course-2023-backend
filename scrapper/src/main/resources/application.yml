@@ -25,6 +25,9 @@ app:
         status-codes: [ 500, 502, 503 ]
         policy: CONSTANT
         step: 0s
+  rate-limit:
+    requests: 30
+    interval: 1m
   database-access-type: jpa
 
 spring:
