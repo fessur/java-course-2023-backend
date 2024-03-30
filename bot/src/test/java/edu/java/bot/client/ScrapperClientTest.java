@@ -8,6 +8,7 @@ import edu.java.bot.client.exception.BadRequestException;
 import edu.java.bot.client.exception.ConflictException;
 import edu.java.bot.client.exception.NotFoundException;
 import edu.java.bot.client.implementation.ScrapperClientImpl;
+import edu.java.bot.client.retry.RetryConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -38,7 +39,8 @@ public class ScrapperClientTest {
 
     @BeforeEach
     void setUp() {
-        scrapperClient = new ScrapperClientImpl("http://localhost:8089");
+        scrapperClient = new ScrapperClientImpl("http://localhost:8089",
+            new RetryConfiguration().retryTemplate(new RetryBuilder(1, new int[]{500}).constant(0)));
     }
 
     @Test

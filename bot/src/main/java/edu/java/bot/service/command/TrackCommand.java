@@ -29,7 +29,7 @@ public class TrackCommand extends Command {
     }
 
     @Override
-    public SendMessage process(Update update) {
+    protected SendMessage processUpdate(Update update) {
         try {
             LinkResponse linkResponse = scrapperClient.trackLink(
                 update.message().chat().id(),

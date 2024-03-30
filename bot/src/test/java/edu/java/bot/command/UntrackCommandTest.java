@@ -76,6 +76,14 @@ public class UntrackCommandTest extends LinksCommandsBaseTest {
     }
 
     @Test
+    public void testTooManyRequests() {
+        Update update = new UpdateMock().withChat().withMessage("/untrack " + LINKS.getFirst()).build();
+        setTooManyRequests(update.message().chat().id());
+        SendMessage sendMessage = untrackCommand.process(update);
+        TestUtils.checkMessage(sendMessage, TOO_MANY_REQUESTS_MSG);
+    }
+
+    @Test
     public void testSupports() {
         assertThat(untrackCommand.supports(new UpdateMock().withMessage("/untrack " + LINKS.getFirst())
             .build())).isTrue();

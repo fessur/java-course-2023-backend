@@ -28,7 +28,7 @@ public class ListCommand extends Command {
     }
 
     @Override
-    public SendMessage process(Update update) {
+    protected SendMessage processUpdate(Update update) {
         try {
             ListLinksResponse links = scrapperClient.fetchLinks(update.message().chat().id());
             if (links.links().isEmpty()) {

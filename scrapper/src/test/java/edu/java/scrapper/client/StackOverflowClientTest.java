@@ -4,6 +4,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.StackOverflowClient;
 import edu.java.client.dto.StackOverflowPostInnerResponse;
 import edu.java.client.implementation.StackOverflowClientImpl;
+import edu.java.client.retry.RetryConfiguration;
+import edu.java.configuration.ApplicationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
@@ -13,11 +15,16 @@ import static org.assertj.core.api.Assertions.*;
 @WireMockTest(httpPort = 8082)
 public class StackOverflowClientTest {
 
+    private static final String BASE_URL = "http://localhost:8082";
+
     private StackOverflowClient stackOverflowClient;
 
     @BeforeEach
     public void setUp() {
-        stackOverflowClient = new StackOverflowClientImpl("http://localhost:8082");
+        stackOverflowClient = new StackOverflowClientImpl(
+            BASE_URL,
+            new RetryConfiguration().stackOverflowRetryTemplate(createApplicationConfig())
+        );
     }
 
     @Test
@@ -111,5 +118,14 @@ public class StackOverflowClientTest {
                       "quota_remaining": 9953
                     }
                     """)));
+    }
+
+    private ApplicationConfig createApplicationConfig() {
+        return new ApplicationConfig(null, new ApplicationConfig.Clients(null,
+            new ApplicationConfig.StackOverflow(
+                BASE_URL,
+                new RetryBuilder(1, new int[] {500}).constant(0)
+            ), null
+        ), null);
     }
 }

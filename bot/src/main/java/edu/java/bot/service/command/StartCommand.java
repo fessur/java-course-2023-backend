@@ -25,7 +25,7 @@ public class StartCommand extends Command {
     }
 
     @Override
-    public SendMessage process(Update update) {
+    protected SendMessage processUpdate(Update update) {
         try {
             scrapperClient.registerChat(update.message().chat().id());
         } catch (ConflictException ex) {

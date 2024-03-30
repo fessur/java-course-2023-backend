@@ -4,6 +4,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.TrackerBotClient;
 import edu.java.client.exception.BadRequestException;
 import edu.java.client.implementation.TrackerBotClientImpl;
+import edu.java.client.retry.RetryConfiguration;
+import edu.java.configuration.ApplicationConfig;
 import edu.java.service.model.Link;
 import edu.java.service.model.jdbc.JdbcLink;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,11 +18,15 @@ import static org.assertj.core.api.Assertions.*;
 @WireMockTest(httpPort = 8083)
 public class TrackerBotClientTest {
 
+    private static final String BASE_URL = "http://localhost:8083";
+
     private TrackerBotClient trackerBotClient;
 
     @BeforeEach
     public void setUp() {
-        trackerBotClient = new TrackerBotClientImpl("http://localhost:8083");
+        trackerBotClient = new TrackerBotClientImpl(
+            BASE_URL,
+            new RetryConfiguration().trackerBotRetryTemplate(createApplicationConfig()));
     }
 
     @Test
@@ -89,5 +95,14 @@ public class TrackerBotClientTest {
                   ]
             }
             """;
+    }
+
+    private ApplicationConfig createApplicationConfig() {
+        return new ApplicationConfig(null, new ApplicationConfig.Clients(null, null,
+            new ApplicationConfig.TrackerBot(
+                BASE_URL,
+                new RetryBuilder(1, new int[] {500}).constant(0)
+            )
+        ), null);
     }
 }
