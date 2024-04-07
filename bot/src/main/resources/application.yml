@@ -14,6 +14,9 @@ kafka:
     maxPollIntervalMs: 300_000
     enableAutoCommit: false
     concurrency: 1
+    backoff:
+      interval: 1s
+      max-attempts: 3
   producer:
     bootstrapServers: localhost:29092
     clientId: scrapper

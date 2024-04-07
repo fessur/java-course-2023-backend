@@ -1,7 +1,9 @@
 package edu.java.bot.configuration.props;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -23,6 +25,11 @@ public record KafkaConsumerProperties(
     boolean enableAutoCommit,
 
     @Positive
-    Integer concurrency
+    Integer concurrency,
+
+    @NotNull
+    Backoff backoff
 ) {
+    public record Backoff(@NotNull Duration interval, @Positive int maxAttempts) {
+    }
 }

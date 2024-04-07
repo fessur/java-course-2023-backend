@@ -5,9 +5,9 @@ import edu.java.bot.gateway.dto.LinkUpdate;
 import edu.java.bot.gateway.kafka.LinkUpdatesDLQGateway;
 import edu.java.bot.gateway.kafka.LinkUpdatesListener;
 import edu.java.bot.service.BotService;
+import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -40,8 +40,14 @@ public class KafkaConsumerConfiguration {
     }
 
     @Bean
-    public DefaultErrorHandler errorHandler(LinkUpdatesDLQGateway linkUpdatesDLQGateway) {
-        BackOff fixedBackOff = new FixedBackOff(1000, 3);
+    public DefaultErrorHandler errorHandler(
+        LinkUpdatesDLQGateway linkUpdatesDLQGateway,
+        KafkaConsumerProperties kafkaConsumerProperties
+    ) {
+        BackOff fixedBackOff = new FixedBackOff(
+            kafkaConsumerProperties.backoff().interval().toMillis(),
+            kafkaConsumerProperties.backoff().maxAttempts()
+        );
         DefaultErrorHandler errorHandler = new DefaultErrorHandler((consumerRecord, ex) -> {
             log.error(
                 "Couldn't process message, sending to DLQ: {}, exception: {}",

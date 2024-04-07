@@ -6,6 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 @Slf4j
 public class KafkaUpdatesGateway implements UpdatesGateway {
+    private static final String ERROR_LOG_MSG = "Cannot send link update: {}";
     private final KafkaTemplate<String, LinkUpdate> scrapperUpdatesProducer;
 
     public KafkaUpdatesGateway(KafkaTemplate<String, LinkUpdate> scrapperUpdatesProducer) {
@@ -18,7 +19,7 @@ public class KafkaUpdatesGateway implements UpdatesGateway {
             scrapperUpdatesProducer.send("updates", linkUpdate)
                 .whenComplete((result, throwable) -> {
                     if (throwable != null) {
-                        log.error("Cannot send link update: {}", linkUpdate, throwable);
+                        log.error(ERROR_LOG_MSG, linkUpdate, throwable);
                     } else {
                         log.info(
                             "Sent link update: {}, topic: {}, offset: {}",
@@ -29,7 +30,7 @@ public class KafkaUpdatesGateway implements UpdatesGateway {
                     }
                 });
         } catch (Exception ex) {
-            log.error("Cannot send link update: {}", linkUpdate, ex);
+            log.error(ERROR_LOG_MSG, linkUpdate, ex);
         }
     }
 }

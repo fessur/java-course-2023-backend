@@ -1,10 +1,10 @@
 package edu.java.service.site.jdbc;
 
 import edu.java.client.GithubClient;
-import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.gateway.UpdatesGateway;
-import edu.java.service.model.Chat;
 import edu.java.gateway.dto.LinkUpdate;
+import edu.java.repository.jdbc.JdbcChatRepository;
+import edu.java.service.model.Chat;
 import edu.java.service.model.jdbc.JdbcLink;
 import edu.java.service.site.Github;
 import edu.java.util.CommonUtils;
