@@ -57,7 +57,7 @@ kafka:
     bootstrapServers: localhost:29092
     clientId: scrapper
     acksMode: all
-    deliveryTimeout: 20s
+    deliveryTimeout: 60s
     lingerMs: 2000
     batchSize: 100_000
     maxInFlightPerConnection: 5
