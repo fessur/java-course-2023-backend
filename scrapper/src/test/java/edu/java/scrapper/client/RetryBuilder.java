@@ -1,6 +1,6 @@
 package edu.java.scrapper.client;
 
-import edu.java.configuration.ApplicationConfig;
+import edu.java.configuration.props.ApplicationConfig;
 import java.time.Duration;
 
 public class RetryBuilder {

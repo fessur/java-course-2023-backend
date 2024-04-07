@@ -5,9 +5,9 @@ import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.dto.GithubRepositoryResponse;
 import edu.java.client.implementation.GithubClientImpl;
-import edu.java.configuration.ApplicationConfig;
 import edu.java.client.retry.RetryConfiguration;
 import java.time.OffsetDateTime;
+import edu.java.configuration.props.ApplicationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static com.github.tomakehurst.wiremock.client.WireMock.forbidden;
@@ -224,6 +224,6 @@ public class GithubClientTest {
                 BASE_URL,
                 new RetryBuilder(1, new int[] {500}).constant(0)
             ), null, null
-        ), null, null);
+        ), null, null, false);
     }
 }

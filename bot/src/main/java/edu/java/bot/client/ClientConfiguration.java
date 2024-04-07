@@ -1,7 +1,7 @@
 package edu.java.bot.client;
 
 import edu.java.bot.client.implementation.ScrapperClientImpl;
-import edu.java.bot.configuration.ApplicationConfig;
+import edu.java.bot.configuration.props.ApplicationConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.util.retry.Retry;

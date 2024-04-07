@@ -2,10 +2,10 @@ package edu.java.service;
 
 import edu.java.service.site.Site;
 import edu.java.util.CommonUtils;
+import org.springframework.stereotype.Service;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 
 @Service
 public class SiteService {

@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.implementation.GithubClientImpl;
-import edu.java.configuration.ApplicationConfig;
 import edu.java.client.retry.RetryConfiguration;
+import edu.java.configuration.props.ApplicationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -78,6 +78,6 @@ public class RetryTest {
             new ApplicationConfig.Github(
                 BASE_URL, retry
             ), null, null
-        ), null, null);
+        ), null, null, false);
     }
 }

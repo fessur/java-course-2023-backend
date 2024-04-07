@@ -2,7 +2,7 @@ package edu.java.bot.service;
 
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.bot.TrackerBot;
-import java.util.List;
+import java.util.Collection;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class BotService {
         bot.execute(new SendMessage(chatId, String.format("%s has new update!\n%s", description, url)));
     }
 
-    public void sendMessages(List<Long> chatIds, String url, String description) {
+    public void sendMessages(Collection<Long> chatIds, String url, String description) {
         for (Long chatId : chatIds) {
             sendMessage(chatId, url, description);
         }

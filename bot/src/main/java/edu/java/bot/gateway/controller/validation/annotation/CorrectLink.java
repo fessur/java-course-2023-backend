@@ -1,6 +1,6 @@
-package edu.java.bot.controller.validation.annotation;
+package edu.java.bot.gateway.controller.validation.annotation;
 
-import edu.java.bot.controller.validation.LinkValidator;
+import edu.java.bot.gateway.controller.validation.LinkValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.ElementType;

@@ -1,6 +1,6 @@
-package edu.java.bot.controller.validation;
+package edu.java.bot.gateway.controller.validation;
 
-import edu.java.bot.controller.validation.annotation.CorrectLink;
+import edu.java.bot.gateway.controller.validation.annotation.CorrectLink;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.net.MalformedURLException;

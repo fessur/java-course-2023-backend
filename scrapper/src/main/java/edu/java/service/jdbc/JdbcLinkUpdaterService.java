@@ -1,6 +1,6 @@
 package edu.java.service.jdbc;
 
-import edu.java.configuration.ApplicationConfig;
+import edu.java.configuration.props.ApplicationConfig;
 import edu.java.repository.jdbc.JdbcLinkRepository;
 import edu.java.service.LinkUpdaterService;
 import edu.java.service.model.jdbc.JdbcLink;

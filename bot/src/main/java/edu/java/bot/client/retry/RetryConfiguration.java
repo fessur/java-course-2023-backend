@@ -1,6 +1,6 @@
 package edu.java.bot.client.retry;
 
-import edu.java.bot.configuration.ApplicationConfig;
+import edu.java.bot.configuration.props.ApplicationConfig;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Predicate;

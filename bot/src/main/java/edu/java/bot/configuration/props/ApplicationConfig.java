@@ -1,4 +1,4 @@
-package edu.java.bot.configuration;
+package edu.java.bot.configuration.props;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

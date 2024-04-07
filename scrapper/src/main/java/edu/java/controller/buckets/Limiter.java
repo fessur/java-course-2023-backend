@@ -1,6 +1,6 @@
 package edu.java.controller.buckets;
 
-import edu.java.configuration.ApplicationConfig;
+import edu.java.configuration.props.ApplicationConfig;
 import io.github.bucket4j.Bucket;
 import java.time.Duration;
 import java.util.HashMap;
