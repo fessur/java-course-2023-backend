@@ -5,12 +5,14 @@ import edu.java.util.CommonUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest
-public class SiteServiceTest extends IntegrationTest {
+public class SiteServiceTest extends BaseDatabaseTest {
     @Autowired
     private SiteService siteService;
+
     @Test
     public void testNormalize() {
         assertThat(siteService.normalizeLink(CommonUtils.toURL(

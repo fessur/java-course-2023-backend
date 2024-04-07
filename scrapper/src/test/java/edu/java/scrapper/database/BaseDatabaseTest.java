@@ -2,6 +2,8 @@ package edu.java.scrapper.database;
 
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import java.util.List;
 
@@ -31,4 +33,9 @@ public abstract class BaseDatabaseTest extends IntegrationTest {
         "https://github.com/lichao-sun/Mora",
         "https://github.com/jgthms/bulma"
     );
+
+    @DynamicPropertySource
+    static void dbProperties(DynamicPropertyRegistry registry) {
+        registry.add("app.use-queue", () -> "false");
+    }
 }
