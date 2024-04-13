@@ -1,13 +1,13 @@
-package edu.java.service.domains;
+package edu.java.service.site;
 
 import edu.java.client.StackOverflowClient;
 import java.net.URL;
 
-public abstract class StackOverflowDomain implements Domain {
+public abstract class StackOverflow implements Site {
     private static final String NAME = "stackoverflow.com";
     protected final StackOverflowClient stackOverflowClient;
 
-    protected StackOverflowDomain(StackOverflowClient stackOverflowClient) {
+    protected StackOverflow(StackOverflowClient stackOverflowClient) {
         this.stackOverflowClient = stackOverflowClient;
     }
 

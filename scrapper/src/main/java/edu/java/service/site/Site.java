@@ -1,8 +1,8 @@
-package edu.java.service.domains;
+package edu.java.service.site;
 
 import java.net.URL;
 
-public interface Domain {
+public interface Site {
     boolean isValid(URL url);
 
     boolean exists(URL url);

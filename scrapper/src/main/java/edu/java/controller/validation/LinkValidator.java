@@ -1,7 +1,7 @@
 package edu.java.controller.validation;
 
 import edu.java.controller.validation.annotation.SupportedLink;
-import edu.java.service.DomainService;
+import edu.java.service.SiteService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.net.MalformedURLException;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LinkValidator implements ConstraintValidator<SupportedLink, String> {
-    private final DomainService domainService;
+    private final SiteService siteService;
 
-    public LinkValidator(DomainService domainService) {
-        this.domainService = domainService;
+    public LinkValidator(SiteService siteService) {
+        this.siteService = siteService;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LinkValidator implements ConstraintValidator<SupportedLink, String>
         constraintValidatorContext.disableDefaultConstraintViolation();
         try {
             URL parsed = new URI(link).toURL();
-            Optional<String> validationMessage = domainService.validateLink(parsed);
+            Optional<String> validationMessage = siteService.validateLink(parsed);
             if (validationMessage.isPresent()) {
                 constraintValidatorContext.buildConstraintViolationWithTemplate(validationMessage.get())
                     .addConstraintViolation();

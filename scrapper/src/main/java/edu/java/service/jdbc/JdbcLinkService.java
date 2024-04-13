@@ -2,8 +2,8 @@ package edu.java.service.jdbc;
 
 import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.repository.jdbc.JdbcLinkRepository;
-import edu.java.service.DomainService;
 import edu.java.service.LinkService;
+import edu.java.service.SiteService;
 import edu.java.service.exception.LinkAlreadyTrackingException;
 import edu.java.service.exception.NoSuchChatException;
 import edu.java.service.exception.NoSuchLinkException;
@@ -17,22 +17,22 @@ public class JdbcLinkService implements LinkService {
     private static final String NOT_REGISTERED_MESSAGE = "Chat is not registered";
     private final JdbcChatRepository chatRepository;
     private final JdbcLinkRepository linkRepository;
-    private final DomainService domainService;
+    private final SiteService siteService;
 
     public JdbcLinkService(
         JdbcChatRepository chatRepository,
         JdbcLinkRepository linkRepository,
-        DomainService domainService
+        SiteService siteService
     ) {
         this.chatRepository = chatRepository;
         this.linkRepository = linkRepository;
-        this.domainService = domainService;
+        this.siteService = siteService;
     }
 
     @Override
     public JdbcLink add(String url, long chatId) {
         chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(NOT_REGISTERED_MESSAGE));
-        String normalized = domainService.normalizeLink(CommonUtils.toURL(url));
+        String normalized = siteService.normalizeLink(CommonUtils.toURL(url));
         linkRepository.findByURL(normalized).ifPresentOrElse(link -> {
             if (linkRepository.checkConnected(link.getId(), chatId)) {
                 throw new LinkAlreadyTrackingException("Link is already tracking");
@@ -45,7 +45,7 @@ public class JdbcLinkService implements LinkService {
     @Override
     public JdbcLink remove(String url, long chatId) {
         chatRepository.findById(chatId).orElseThrow(() -> new NoSuchChatException(NOT_REGISTERED_MESSAGE));
-        String normalized = domainService.normalizeLink(CommonUtils.toURL(url));
+        String normalized = siteService.normalizeLink(CommonUtils.toURL(url));
         JdbcLink link =
             linkRepository.findByURL(normalized).orElseThrow(() -> new NoSuchLinkException("Cannot find link"));
         if (!linkRepository.checkConnected(link.getId(), chatId)) {

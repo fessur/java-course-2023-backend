@@ -1,6 +1,6 @@
 package edu.java.service;
 
-import edu.java.service.domains.Domain;
+import edu.java.service.site.Site;
 import edu.java.util.CommonUtils;
 import java.net.URL;
 import java.util.List;
@@ -8,10 +8,10 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DomainService {
-    private final List<Domain> domains;
+public class SiteService {
+    private final List<Site> domains;
 
-    public DomainService(List<Domain> domains) {
+    public SiteService(List<Site> domains) {
         this.domains = domains;
     }
 
@@ -22,8 +22,8 @@ public class DomainService {
             }
             return Optional.of(d.notExistsMessage());
         }).orElse(Optional.of(
-            "Domain " + url.getHost() + " is not supported yet. List of all supported domains:\n"
-                + CommonUtils.joinEnumerated(domains.stream().map(Domain::toString).toList(), 1)));
+            "Site " + url.getHost() + " is not supported yet. List of all supported domains:\n"
+                + CommonUtils.joinEnumerated(domains.stream().map(Site::toString).toList(), 1)));
     }
 
     public String normalizeLink(URL url) {
