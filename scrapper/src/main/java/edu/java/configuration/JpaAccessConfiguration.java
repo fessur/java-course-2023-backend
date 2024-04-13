@@ -6,16 +6,16 @@ import edu.java.client.TrackerBotClient;
 import edu.java.repository.jpa.JpaChatRepository;
 import edu.java.repository.jpa.JpaLinkRepository;
 import edu.java.service.ChatService;
-import edu.java.service.DomainService;
 import edu.java.service.LinkService;
 import edu.java.service.LinkUpdaterService;
-import edu.java.service.domains.Domain;
-import edu.java.service.site.jpa.JpaDomain;
-import edu.java.service.site.jpa.JpaGithub;
-import edu.java.service.site.jpa.JpaStackOverflow;
+import edu.java.service.SiteService;
 import edu.java.service.jpa.JpaChatService;
 import edu.java.service.jpa.JpaLinkService;
 import edu.java.service.jpa.JpaLinkUpdaterService;
+import edu.java.service.site.Site;
+import edu.java.service.site.jpa.JpaGithub;
+import edu.java.service.site.jpa.JpaSite;
+import edu.java.service.site.jpa.JpaStackOverflow;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +27,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "edu.java.repository.jpa")
 public class JpaAccessConfiguration {
     @Bean
-    public List<Domain> domains(
+    public List<Site> sites(
         GithubClient githubClient,
         StackOverflowClient stackOverflowClient,
         TrackerBotClient trackerBotClient
@@ -42,9 +42,9 @@ public class JpaAccessConfiguration {
     public LinkService linkService(
         JpaChatRepository chatRepository,
         JpaLinkRepository linkRepository,
-        DomainService domainService
+        SiteService siteService
     ) {
-        return new JpaLinkService(chatRepository, linkRepository, domainService);
+        return new JpaLinkService(chatRepository, linkRepository, siteService);
     }
 
     @Bean
@@ -56,8 +56,8 @@ public class JpaAccessConfiguration {
     public LinkUpdaterService linkUpdaterService(
         JpaLinkRepository linkRepository,
         ApplicationConfig applicationConfig,
-        List<JpaDomain> domains
+        List<JpaSite> sites
     ) {
-        return new JpaLinkUpdaterService(linkRepository, applicationConfig, domains);
+        return new JpaLinkUpdaterService(linkRepository, applicationConfig, sites);
     }
 }

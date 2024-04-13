@@ -3,8 +3,8 @@ package edu.java.service.jpa;
 import edu.java.repository.jpa.JpaChatRepository;
 import edu.java.repository.jpa.JpaLinkRepository;
 import edu.java.service.ChatService;
-import edu.java.service.DomainService;
 import edu.java.service.LinkService;
+import edu.java.service.SiteService;
 import edu.java.service.exception.LinkAlreadyTrackingException;
 import edu.java.service.exception.NoSuchChatException;
 import edu.java.service.exception.NoSuchLinkException;
@@ -17,22 +17,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class JpaLinkService implements LinkService {
     private final JpaChatRepository chatRepository;
     private final JpaLinkRepository linkRepository;
-    private final DomainService domainService;
+    private final SiteService siteService;
 
     public JpaLinkService(
         JpaChatRepository chatRepository,
         JpaLinkRepository linkRepository,
-        DomainService domainService
+        SiteService siteService
     ) {
         this.chatRepository = chatRepository;
         this.linkRepository = linkRepository;
-        this.domainService = domainService;
+        this.siteService = siteService;
     }
 
     @Override
     @Transactional
     public JpaLink add(String url, long chatId) {
-        String normalized = domainService.normalizeLink(CommonUtils.toURL(url));
+        String normalized = siteService.normalizeLink(CommonUtils.toURL(url));
         JpaChat chat =
             chatRepository.findById(chatId)
                 .orElseThrow(() -> new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE));
@@ -52,7 +52,7 @@ public class JpaLinkService implements LinkService {
     @Override
     @Transactional
     public JpaLink remove(String url, long chatId) {
-        String normalized = domainService.normalizeLink(CommonUtils.toURL(url));
+        String normalized = siteService.normalizeLink(CommonUtils.toURL(url));
         JpaChat chat = chatRepository.findById(chatId).orElseThrow(() ->
             new NoSuchChatException(ChatService.NOT_REGISTERED_MESSAGE)
         );

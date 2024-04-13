@@ -9,25 +9,25 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SiteService {
-    private final List<Site> domains;
+    private final List<Site> sites;
 
-    public SiteService(List<Site> domains) {
-        this.domains = domains;
+    public SiteService(List<Site> sites) {
+        this.sites = sites;
     }
 
     public Optional<String> validateLink(URL url) {
-        return domains.stream().filter(d -> d.isValid(url)).findFirst().map(d -> {
+        return sites.stream().filter(d -> d.isValid(url)).findFirst().map(d -> {
             if (d.exists(url)) {
                 return Optional.<String>empty();
             }
             return Optional.of(d.notExistsMessage());
         }).orElse(Optional.of(
             "Site " + url.getHost() + " is not supported yet. List of all supported domains:\n"
-                + CommonUtils.joinEnumerated(domains.stream().map(Site::toString).toList(), 1)));
+                + CommonUtils.joinEnumerated(sites.stream().map(Site::toString).toList(), 1)));
     }
 
     public String normalizeLink(URL url) {
-        return domains.stream().filter(d -> d.isValid(url)).findFirst().map(d -> d.normalize(url))
+        return sites.stream().filter(d -> d.isValid(url)).findFirst().map(d -> d.normalize(url))
             .orElseThrow(() -> new IllegalArgumentException("The domain is not supported"));
     }
 }
