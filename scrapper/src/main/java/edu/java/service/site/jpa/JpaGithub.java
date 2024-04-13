@@ -3,7 +3,6 @@ package edu.java.service.site.jpa;
 import edu.java.client.GithubClient;
 import edu.java.gateway.UpdatesGateway;
 import edu.java.gateway.dto.LinkUpdate;
-import edu.java.service.domains.GithubDomain;
 import edu.java.service.model.jpa.JpaChat;
 import edu.java.service.model.jpa.JpaLink;
 import edu.java.service.site.Github;
