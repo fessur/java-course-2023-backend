@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SiteService {
-    private final List<Site> sites;
+    private final List<? extends Site> sites;
 
-    public SiteService(List<Site> sites) {
+    public SiteService(List<? extends Site> sites) {
         this.sites = sites;
     }
 
