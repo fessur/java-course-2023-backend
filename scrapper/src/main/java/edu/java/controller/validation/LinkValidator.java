@@ -38,7 +38,7 @@ public class LinkValidator implements ConstraintValidator<SupportedLink, String>
                 return true;
             }
         } catch (MalformedURLException | URISyntaxException | IllegalArgumentException ex) {
-            constraintValidatorContext.buildConstraintViolationWithTemplate("The link is not correct")
+            constraintValidatorContext.buildConstraintViolationWithTemplate("The link is not correct.")
                 .addConstraintViolation();
             return false;
         }
