@@ -64,9 +64,39 @@ services:
     networks:
       - backend
 
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./metrics/prometheus:/etc/prometheus
+      - prometheus:/prometheus
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana-oss:10.2.2
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/password
+    depends_on:
+      - prometheus
+    volumes:
+      - ./metrics/grafana/password.txt:/run/secrets/password
+      - grafana:/var/lib/grafana
+    networks:
+      - backend
+
 volumes:
   postgresql: { }
   kafka: { }
+  prometheus: { }
+  grafana: { }
 
 networks:
   backend: { }
