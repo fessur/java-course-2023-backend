@@ -43,13 +43,13 @@ public class TrackerBot extends TelegramBot {
     }
 
     private void process(Update update) {
-        for (Command command : commands) {
-            if (command.supports(update)) {
-                execute(command.process(update));
-                return;
-            }
-        }
-        processUnrecognizedCommand(update);
+        commands.stream()
+            .filter(cmd -> cmd.supports(update))
+            .findAny()
+            .ifPresentOrElse(
+                cmd -> execute(cmd.process(update)),
+                () -> processUnrecognizedCommand(update)
+            );
         processedMessages.increment();
     }
 

@@ -37,7 +37,7 @@ public class UntrackCommand extends Command {
             return new SendMessage(update.message().chat().id(),
                 "Link " + linkResponse.url() + " is no longer being tracked.");
         } catch (BadRequestException ex) {
-            return new SendMessage(update.message().chat().id(), "The link is not correct");
+            return new SendMessage(update.message().chat().id(), "The link is not correct.");
         } catch (NotFoundException ex) {
             return new SendMessage(update.message().chat().id(), "You are not tracking this link yet");
         }

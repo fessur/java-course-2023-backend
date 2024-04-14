@@ -31,7 +31,7 @@ public class StartCommand extends Command {
         } catch (ConflictException ex) {
             return new SendMessage(
                 update.message().chat().id(),
-                "You are already working with our bot. Use /help to see a list of all possible commands");
+                "You are already working with our bot. Use /help to see a list of all possible commands.");
         }
         return new SendMessage(update.message().chat().id(), "Hello! Welcome to our bot!");
     }
