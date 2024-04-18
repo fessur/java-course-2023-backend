@@ -1,7 +1,10 @@
 package edu.java.client;
 
-import edu.java.client.dto.StackOverflowPostResponse;
+import edu.java.client.dto.StackOverflowPostInnerResponse;
+import java.util.Optional;
 
 public interface StackOverflowClient {
-    StackOverflowPostResponse fetchPost(long id);
+    Optional<StackOverflowPostInnerResponse> fetchPost(long id);
+
+    boolean exists(long id);
 }

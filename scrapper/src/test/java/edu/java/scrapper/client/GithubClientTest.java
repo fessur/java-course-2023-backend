@@ -2,6 +2,7 @@ package edu.java.scrapper.client;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.GithubClient;
+import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.dto.GithubRepositoryResponse;
 import edu.java.client.implementation.GithubClientImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,10 +22,74 @@ public class GithubClientTest {
     }
 
     @Test
-    public void testFetchRepository() {
+    public void testFetchRepositorySuccess() {
         final String owner = "torvalds";
         final String repository = "linux";
 
+        setOkStub(owner, repository);
+
+        assertThat(githubClient.fetchRepository(new GithubRepositoryRequest(owner, repository)))
+            .isPresent()
+            .hasValueSatisfying(response ->
+                assertThat(response)
+                    .extracting(
+                        GithubRepositoryResponse::id,
+                        GithubRepositoryResponse::name,
+                        GithubRepositoryResponse::lastActivityDate
+                    )
+                    .containsExactly(
+                        2325298L,
+                        String.format("%s/%s", owner, repository),
+                        OffsetDateTime.parse("2024-02-23T15:30:57Z")
+                    ));
+
+    }
+
+    @Test
+    public void testFetchRepositoryFailed() {
+        final String owner = "torvalds";
+        final String repository = "linux";
+
+        stubFor(get(String.format("/repos/%s/%s", owner, repository))
+            .willReturn(notFound()));
+
+        assertThat(githubClient.fetchRepository(new GithubRepositoryRequest(owner, repository)))
+            .isEmpty();
+    }
+
+    @Test
+    public void testExistsSuccess() {
+        final String owner = "torvalds";
+        final String repository = "linux";
+
+        setOkStub(owner, repository);
+
+        assertThat(githubClient.exists(new GithubRepositoryRequest(owner, repository))).isTrue();
+    }
+
+    @Test
+    public void testNotExists() {
+        final String owner = "fjdklsjklajkl";
+        final String repository = "sdjlqwofjdkl";
+
+        stubFor(get(String.format("/repos/%s/%s", owner, repository))
+            .willReturn(notFound()));
+
+        assertThat(githubClient.exists(new GithubRepositoryRequest(owner, repository))).isFalse();
+    }
+
+    @Test
+    public void testPrivate() {
+        final String owner = "fessur";
+        final String repository = "Computer-Architecture";
+
+        stubFor(get(String.format("/repos/%s/%s", owner, repository))
+            .willReturn(forbidden()));
+
+        assertThat(githubClient.exists(new GithubRepositoryRequest(owner, repository))).isFalse();
+    }
+
+    private void setOkStub(String owner, String repository) {
         stubFor(get(String.format("/repos/%s/%s", owner, repository))
             .willReturn(ok()
                 .withHeader("Content-Type", "application/json")
@@ -140,19 +205,5 @@ public class GithubClientTest {
                       "network_count": 51043,
                       "subscribers_count": 8334
                     }""")));
-        GithubRepositoryResponse response = githubClient.fetchRepository(owner, repository);
-
-        assertThat(response)
-            .isNotNull()
-            .extracting(
-                GithubRepositoryResponse::id,
-                GithubRepositoryResponse::name,
-                GithubRepositoryResponse::lastActivityDate
-            )
-            .containsExactly(
-                2325298L,
-                String.format("%s/%s", owner, repository),
-                OffsetDateTime.parse("2024-02-23T15:30:57Z")
-            );
     }
 }

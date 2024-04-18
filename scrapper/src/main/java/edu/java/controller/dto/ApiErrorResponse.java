@@ -1,5 +1,6 @@
 package edu.java.controller.dto;
 
+import java.util.Collections;
 import java.util.List;
 
 public record ApiErrorResponse(
@@ -9,6 +10,6 @@ public record ApiErrorResponse(
     String exceptionMessage,
     List<String> stacktrace) {
     public ApiErrorResponse(String description, String code) {
-        this(description, code, "", "", List.of());
+        this(description, code, "", "", Collections.emptyList());
     }
 }

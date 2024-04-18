@@ -1,22 +1,22 @@
 package edu.java.controller.validation;
 
 import edu.java.controller.validation.annotation.SupportedLink;
-import edu.java.service.LinkService;
-import edu.java.util.CommonUtils;
+import edu.java.service.SiteService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
 public class LinkValidator implements ConstraintValidator<SupportedLink, String> {
-    private final LinkService linkService;
+    private final SiteService siteService;
 
-    public LinkValidator(LinkService linkService) {
-        this.linkService = linkService;
+    public LinkValidator(SiteService siteService) {
+        this.siteService = siteService;
     }
 
     @Override
@@ -29,13 +29,14 @@ public class LinkValidator implements ConstraintValidator<SupportedLink, String>
         constraintValidatorContext.disableDefaultConstraintViolation();
         try {
             URL parsed = new URI(link).toURL();
-            if (!linkService.isSupported(parsed.getHost())) {
-                constraintValidatorContext.buildConstraintViolationWithTemplate(
-                    "Domain " + parsed.getHost() + " is not supported yet. List of all supported domains:\n"
-                        + CommonUtils.joinEnumerated(linkService.getSupportedDomains(), 1)).addConstraintViolation();
+            Optional<String> validationMessage = siteService.validateLink(parsed);
+            if (validationMessage.isPresent()) {
+                constraintValidatorContext.buildConstraintViolationWithTemplate(validationMessage.get())
+                    .addConstraintViolation();
                 return false;
+            } else {
+                return true;
             }
-            return true;
         } catch (MalformedURLException | URISyntaxException | IllegalArgumentException ex) {
             constraintValidatorContext.buildConstraintViolationWithTemplate("The link is not correct")
                 .addConstraintViolation();

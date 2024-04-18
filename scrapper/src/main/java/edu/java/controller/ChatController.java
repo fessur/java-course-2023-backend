@@ -51,6 +51,6 @@ public class ChatController {
         })
     })
     public void delete(@PathVariable("id") long id) {
-        chatService.delete(id);
+        chatService.unregister(id);
     }
 }
