@@ -8,7 +8,7 @@ app:
 
 kafka:
   consumer:
-    bootstrapServers: localhost:29092
+    bootstrapServers: http://localhost:29092
     groupId: tracker-bot
     autoOffsetReset: earliest
     maxPollIntervalMs: 300_000
@@ -18,8 +18,8 @@ kafka:
       interval: 1s
       max-attempts: 3
   producer:
-    bootstrapServers: localhost:29092
-    clientId: scrapper
+    bootstrapServers: http://localhost:29092
+    clientId: bot
     acksMode: all
     deliveryTimeout: 60s
     lingerMs: 2000
