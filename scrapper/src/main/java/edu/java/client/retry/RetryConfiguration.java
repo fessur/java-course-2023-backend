@@ -24,11 +24,6 @@ public class RetryConfiguration {
         return createRetrySpec(applicationConfig.clients().stackOverflow().retry());
     }
 
-    @Bean
-    public Retry trackerBotRetrySpec(ApplicationConfig applicationConfig) {
-        return createRetrySpec(applicationConfig.clients().trackerBot().retry());
-    }
-
     public Retry createRetrySpec(ApplicationConfig.Retry retryConfig) {
         Set<Integer> statusCodes = Arrays.stream(retryConfig.getStatusCodes())
             .boxed().collect(Collectors.toSet());
