@@ -9,10 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-@Repository
 public class JdbcLinkRepositoryImpl implements JdbcLinkRepository {
     private static final String CHAT_ID_PARAM = "chatId";
     private static final String LINK_ID_PARAM = "linkId";

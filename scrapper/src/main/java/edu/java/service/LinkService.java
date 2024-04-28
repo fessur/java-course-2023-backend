@@ -9,4 +9,8 @@ public interface LinkService {
     Link remove(String url, long chatId);
 
     Collection<? extends Link> listAll(long chatId);
+
+    String ALREADY_TRACKING_MESSAGE = "Link is already tracking";
+
+    String NOT_TRACKING_MESSAGE = "You are not tracking this link";
 }

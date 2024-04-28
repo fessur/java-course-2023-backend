@@ -8,9 +8,8 @@ import edu.java.service.site.jdbc.JdbcSite;
 import edu.java.util.CommonUtils;
 import java.util.Collection;
 import java.util.List;
-import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
 public class JdbcLinkUpdaterService implements LinkUpdaterService {
     private final JdbcLinkRepository linkRepository;
     private final ApplicationConfig applicationConfig;
@@ -27,6 +26,7 @@ public class JdbcLinkUpdaterService implements LinkUpdaterService {
     }
 
     @Override
+    @Transactional
     public int update() {
         Collection<JdbcLink> oldest = linkRepository.findOldest(applicationConfig.scheduler().forceCheckDelay());
         oldest.forEach(link -> {

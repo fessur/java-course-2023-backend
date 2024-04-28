@@ -1,30 +1,23 @@
-package edu.java.service.site.jdbc;
+package edu.java.service.site.jpa;
 
 import edu.java.client.StackOverflowClient;
 import edu.java.client.TrackerBotClient;
-import edu.java.repository.jdbc.JdbcChatRepository;
-import edu.java.service.model.Chat;
-import edu.java.service.model.jdbc.JdbcLink;
+import edu.java.service.model.jpa.JpaChat;
+import edu.java.service.model.jpa.JpaLink;
 import edu.java.service.site.StackOverflow;
 import edu.java.util.CommonUtils;
 import java.net.URL;
 
-public class JdbcStackOverflow extends StackOverflow implements JdbcSite {
+public class JpaStackOverflow extends StackOverflow implements JpaSite {
     private final TrackerBotClient trackerBotClient;
-    private final JdbcChatRepository chatRepository;
 
-    public JdbcStackOverflow(
-        TrackerBotClient trackerBotClient,
-        StackOverflowClient stackOverflowClient,
-        JdbcChatRepository chatRepository
-    ) {
+    public JpaStackOverflow(StackOverflowClient stackOverflowClient, TrackerBotClient trackerBotClient) {
         super(stackOverflowClient);
         this.trackerBotClient = trackerBotClient;
-        this.chatRepository = chatRepository;
     }
 
     @Override
-    public void update(JdbcLink link) {
+    public void update(JpaLink link) {
         URL parsed = CommonUtils.toURL(link.getUrl());
         stackOverflowClient.fetchPost(toStackOverflowQuestion(parsed))
             .ifPresent(stackOverflowResponse -> {
@@ -33,7 +26,7 @@ public class JdbcStackOverflow extends StackOverflow implements JdbcSite {
                     trackerBotClient.sendUpdate(
                         link,
                         createDescription(stackOverflowResponse),
-                        chatRepository.findAllByLink(link.getId()).stream().map(Chat::getId).toList()
+                        link.getChats().stream().map(JpaChat::getId).toList()
                     );
                 }
             });

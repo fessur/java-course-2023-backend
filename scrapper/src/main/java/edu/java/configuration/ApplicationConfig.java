@@ -15,11 +15,18 @@ public record ApplicationConfig(
     Scheduler scheduler,
 
     @NotNull
-    BaseUrl baseUrl
+    BaseUrl baseUrl,
+
+    @NotNull
+    AccessType databaseAccessType
 ) {
     public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
     }
 
     public record BaseUrl(@NotEmpty String github, @NotEmpty String stackoverflow, @NotEmpty String trackerBot) {
+    }
+
+    public enum AccessType {
+        JDBC, JPA,
     }
 }
