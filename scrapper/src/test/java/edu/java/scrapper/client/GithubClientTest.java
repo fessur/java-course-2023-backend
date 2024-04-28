@@ -5,13 +5,17 @@ import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.dto.GithubRepositoryResponse;
 import edu.java.client.implementation.GithubClientImpl;
-import edu.java.client.retry.RetryConfiguration;
 import edu.java.configuration.ApplicationConfig;
+import edu.java.client.retry.RetryConfiguration;
+import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.time.OffsetDateTime;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.forbidden;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @WireMockTest(httpPort = 8081)
 public class GithubClientTest {
@@ -24,7 +28,7 @@ public class GithubClientTest {
     public void setUp() {
         githubClient = new GithubClientImpl(
             BASE_URL,
-            new RetryConfiguration().githubRetryTemplate(createApplicationConfig())
+            new RetryConfiguration().githubRetrySpec(createApplicationConfig())
         );
     }
 

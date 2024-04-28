@@ -4,13 +4,15 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.StackOverflowClient;
 import edu.java.client.dto.StackOverflowPostInnerResponse;
 import edu.java.client.implementation.StackOverflowClientImpl;
-import edu.java.client.retry.RetryConfiguration;
 import edu.java.configuration.ApplicationConfig;
+import edu.java.client.retry.RetryConfiguration;
+import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.time.OffsetDateTime;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @WireMockTest(httpPort = 8082)
 public class StackOverflowClientTest {
@@ -23,7 +25,7 @@ public class StackOverflowClientTest {
     public void setUp() {
         stackOverflowClient = new StackOverflowClientImpl(
             BASE_URL,
-            new RetryConfiguration().stackOverflowRetryTemplate(createApplicationConfig())
+            new RetryConfiguration().stackOverflowRetrySpec(createApplicationConfig())
         );
     }
 

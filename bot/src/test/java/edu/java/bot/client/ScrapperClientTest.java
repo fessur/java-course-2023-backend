@@ -40,7 +40,7 @@ public class ScrapperClientTest {
     @BeforeEach
     void setUp() {
         scrapperClient = new ScrapperClientImpl("http://localhost:8089",
-            new RetryConfiguration().retryTemplate(new RetryBuilder(1, new int[]{500}).constant(0)));
+            new RetryConfiguration().retrySpec(new RetryBuilder(1, new int[]{500}).constant(0)));
     }
 
     @Test

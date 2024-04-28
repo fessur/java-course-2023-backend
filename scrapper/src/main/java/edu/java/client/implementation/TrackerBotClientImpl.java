@@ -8,22 +8,21 @@ import edu.java.service.model.Link;
 import java.util.Collection;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 public class TrackerBotClientImpl implements TrackerBotClient {
-    private final RetryTemplate retryTemplate;
+    private final Retry retrySpec;
     private final WebClient webClient;
 
-    public TrackerBotClientImpl(String baseUrl, RetryTemplate retryTemplate) {
-        this.retryTemplate = retryTemplate;
+    public TrackerBotClientImpl(String baseUrl, Retry retrySpec) {
+        this.retrySpec = retrySpec;
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
     }
 
     public void sendUpdate(Link link, String description, Collection<Long> chatIds) {
-        retryTemplate.execute(context -> webClient
-            .post()
+        webClient.post()
             .uri("/updates")
             .bodyValue(new LinkUpdateRequest(link.getId(), link.getUrl(), description, chatIds))
             .retrieve()
@@ -33,6 +32,7 @@ public class TrackerBotClientImpl implements TrackerBotClient {
             )
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.createException().flatMap(Mono::error))
             .bodyToMono(Void.class)
-            .block());
+            .retryWhen(retrySpec)
+            .block();
     }
 }

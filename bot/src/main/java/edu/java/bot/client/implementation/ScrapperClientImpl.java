@@ -14,26 +14,26 @@ import java.util.function.Function;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 public class ScrapperClientImpl implements ScrapperClient {
     private final WebClient webClient;
-    private final RetryTemplate retryTemplate;
+    private final Retry retrySpec;
     private static final String LINKS_API_URL = "/links";
     private static final String CHAT_API_URL = "/tg-chat";
     private static final String CHAT_HEADER = "Tg-Chat-Id";
 
-    public ScrapperClientImpl(String baseUrl, RetryTemplate retryTemplate) {
+    public ScrapperClientImpl(String baseUrl, Retry retrySpec) {
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
-        this.retryTemplate = retryTemplate;
+        this.retrySpec = retrySpec;
     }
 
     @Override
     public ListLinksResponse fetchLinks(long chatId) {
-        return retryTemplate.execute(context -> webClient
+        return webClient
             .get()
             .uri(LINKS_API_URL)
             .header(CHAT_HEADER, Long.toString(chatId))
@@ -46,12 +46,13 @@ public class ScrapperClientImpl implements ScrapperClient {
             )
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.createException().flatMap(Mono::error))
             .bodyToMono(ListLinksResponse.class)
-            .block());
+            .retryWhen(retrySpec)
+            .block();
     }
 
     @Override
     public void registerChat(long chatId) {
-        retryTemplate.execute(context -> webClient
+        webClient
             .post()
             .uri(CHAT_API_URL + "/" + chatId)
             .retrieve()
@@ -63,12 +64,13 @@ public class ScrapperClientImpl implements ScrapperClient {
             )
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.createException().flatMap(Mono::error))
             .bodyToMono(Void.class)
-            .block());
+            .retryWhen(retrySpec)
+            .block();
     }
 
     @Override
     public LinkResponse trackLink(long chatId, String link) {
-        return retryTemplate.execute(context -> webClient
+        return webClient
             .post()
             .uri(LINKS_API_URL)
             .header(CHAT_HEADER, Long.toString(chatId))
@@ -88,12 +90,13 @@ public class ScrapperClientImpl implements ScrapperClient {
             )
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.createException().flatMap(Mono::error))
             .bodyToMono(LinkResponse.class)
-            .block());
+            .retryWhen(retrySpec)
+            .block();
     }
 
     @Override
     public LinkResponse untrackLink(long chatId, String link) {
-        return retryTemplate.execute(context -> webClient
+        return webClient
             .method(HttpMethod.DELETE)
             .uri(LINKS_API_URL)
             .header(CHAT_HEADER, Long.toString(chatId))
@@ -110,7 +113,8 @@ public class ScrapperClientImpl implements ScrapperClient {
             )
             .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse.createException().flatMap(Mono::error))
             .bodyToMono(LinkResponse.class)
-            .block());
+            .retryWhen(retrySpec)
+            .block();
     }
 
     private Mono<Exception> handleStatusCode(

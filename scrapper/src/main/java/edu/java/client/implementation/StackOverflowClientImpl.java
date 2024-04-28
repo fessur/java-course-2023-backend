@@ -4,24 +4,24 @@ import edu.java.client.StackOverflowClient;
 import edu.java.client.dto.StackOverflowPostInnerResponse;
 import edu.java.client.dto.StackOverflowPostResponse;
 import java.util.Optional;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 public class StackOverflowClientImpl implements StackOverflowClient {
     private final WebClient webClient;
-    private final RetryTemplate retryTemplate;
+    private final Retry retrySpec;
     private static final String URI_PATTERN = "/posts/{postId}?site=stackoverflow&filter=!nNPvSNOTRz";
 
-    public StackOverflowClientImpl(String baseUrl, RetryTemplate retryTemplate) {
+    public StackOverflowClientImpl(String baseUrl, Retry retrySpec) {
         this.webClient = WebClient.builder().baseUrl(baseUrl).build();
-        this.retryTemplate = retryTemplate;
+        this.retrySpec = retrySpec;
     }
 
     @Override
     public Optional<StackOverflowPostInnerResponse> fetchPost(long postId) {
         try {
-            Optional<StackOverflowPostResponse> resp = retryTemplate.execute(context -> webClient.get()
+            Optional<StackOverflowPostResponse> resp = webClient.get()
                 .uri(URI_PATTERN, postId)
                 .exchangeToMono(response -> {
                     if (response.statusCode().is4xxClientError() || response.statusCode().is5xxServerError()) {
@@ -29,7 +29,8 @@ public class StackOverflowClientImpl implements StackOverflowClient {
                     }
                     return response.bodyToMono(StackOverflowPostResponse.class).flatMap(r -> Mono.just(Optional.of(r)));
                 })
-                .block());
+                .retryWhen(retrySpec)
+                .block();
             if (resp.isEmpty() || resp.get().items().isEmpty()) {
                 return Optional.empty();
             }
@@ -42,7 +43,7 @@ public class StackOverflowClientImpl implements StackOverflowClient {
     @Override
     public boolean exists(long postId) {
         try {
-            return retryTemplate.execute(context -> Boolean.TRUE.equals(webClient.get()
+            return Boolean.TRUE.equals(webClient.get()
                 .uri(URI_PATTERN, postId)
                 .retrieve()
                 .bodyToMono(StackOverflowPostResponse.class)
@@ -51,7 +52,9 @@ public class StackOverflowClientImpl implements StackOverflowClient {
                         return Mono.just(true);
                     }
                     return Mono.just(false);
-                }).block()));
+                })
+                .retryWhen(retrySpec)
+                .block());
         } catch (Exception ex) {
             return false;
         }

@@ -9,7 +9,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @WireMockTest(httpPort = 8092)
 public class RetryTest {
@@ -26,7 +27,7 @@ public class RetryTest {
     public void testRetryConstant() {
         ScrapperClient scrapperClient = new ScrapperClientImpl(
             BASE_URL,
-            retryConfiguration.retryTemplate(new RetryBuilder(6, new int[] {500}).constant(300))
+            retryConfiguration.retrySpec(new RetryBuilder(6, new int[] {500}).constant(300))
         );
 
         timed(1500, () -> request(scrapperClient));
@@ -36,7 +37,7 @@ public class RetryTest {
     public void testRetryLinear() {
         ScrapperClient scrapperClient = new ScrapperClientImpl(
             BASE_URL,
-            retryConfiguration.retryTemplate(new RetryBuilder(10, new int[] {500})
+            retryConfiguration.retrySpec(new RetryBuilder(10, new int[] {500})
                 .linear(100, 100, 20000))
         );
 
@@ -47,8 +48,8 @@ public class RetryTest {
     public void testRetryExponent() {
         ScrapperClient scrapperClient = new ScrapperClientImpl(
             BASE_URL,
-            retryConfiguration.retryTemplate(new RetryBuilder(6, new int[] {500})
-                .exponent(100, 2, 20000))
+            retryConfiguration.retrySpec(new RetryBuilder(6, new int[] {500})
+                .exponent(100, 20000))
         );
 
         timed(3100, () -> request(scrapperClient));

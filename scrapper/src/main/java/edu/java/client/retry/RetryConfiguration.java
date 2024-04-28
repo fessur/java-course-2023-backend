@@ -3,64 +3,58 @@ package edu.java.client.retry;
 import edu.java.configuration.ApplicationConfig;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.retry.RetryPolicy;
-import org.springframework.retry.backoff.BackOffPolicy;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.retry.support.RetryTemplate;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.util.retry.Retry;
 
 @Configuration
+@Slf4j
 public class RetryConfiguration {
     @Bean
-    public RetryTemplate githubRetryTemplate(ApplicationConfig applicationConfig) {
-        return createRetryTemplate(applicationConfig.clients().github().retry());
+    public Retry githubRetrySpec(ApplicationConfig applicationConfig) {
+        return createRetrySpec(applicationConfig.clients().github().retry());
     }
 
     @Bean
-    public RetryTemplate stackOverflowRetryTemplate(ApplicationConfig applicationConfig) {
-        return createRetryTemplate(applicationConfig.clients().stackOverflow().retry());
+    public Retry stackOverflowRetrySpec(ApplicationConfig applicationConfig) {
+        return createRetrySpec(applicationConfig.clients().stackOverflow().retry());
     }
 
     @Bean
-    public RetryTemplate trackerBotRetryTemplate(ApplicationConfig applicationConfig) {
-        return createRetryTemplate(applicationConfig.clients().trackerBot().retry());
+    public Retry trackerBotRetrySpec(ApplicationConfig applicationConfig) {
+        return createRetrySpec(applicationConfig.clients().trackerBot().retry());
     }
 
-    private RetryTemplate createRetryTemplate(ApplicationConfig.Retry retry) {
-        Set<HttpStatusCode> statusCodes = Arrays.stream(retry.getStatusCodes())
-            .mapToObj(HttpStatusCode::valueOf).collect(Collectors.toSet());
-        RetryPolicy retryPolicy = retry.getMaxAttempts() == null
-            ? new StatusCodeRetryPolicy(statusCodes)
-            : new StatusCodeRetryPolicy(retry.getMaxAttempts(), statusCodes);
+    private Retry createRetrySpec(ApplicationConfig.Retry retryConfig) {
+        Set<Integer> statusCodes = Arrays.stream(retryConfig.getStatusCodes())
+            .boxed().collect(Collectors.toSet());
+        Predicate<Throwable> filter =
+            throwable -> throwable instanceof WebClientResponseException webClientResponseException
+                && statusCodes.contains(webClientResponseException.getStatusCode().value());
+        return switch (retryConfig.getPolicy()) {
+            case CONSTANT ->
+                Retry.fixedDelay(retryConfig.getMaxAttempts(), retryConfig.getStep())
+                    .filter(filter)
+                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> retrySignal.failure());
+            case EXPONENT ->
+                Retry.backoff(retryConfig.getMaxAttempts(), retryConfig.getInitialInterval())
+                    .filter(filter)
+                    .maxBackoff(retryConfig.getMaxInterval())
+                    .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> retrySignal.failure());
+            case LINEAR ->
+                new LinearRetry(
+                    retryConfig.getMaxAttempts(),
+                    retryConfig.getInitialInterval(),
+                    retryConfig.getIncrement(),
+                    filter,
+                    retryConfig.getMaxInterval(),
+                    (retryBackoffSpec, retrySignal) -> retrySignal.failure()
+                );
 
-        BackOffPolicy backOffPolicy = switch (retry.getPolicy()) {
-            case CONSTANT -> {
-                FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
-                fixedBackOffPolicy.setBackOffPeriod(retry.getStep().toMillis());
-                yield fixedBackOffPolicy;
-            }
-            case LINEAR -> {
-                LinearBackOffPolicy linearBackOffPolicy = new LinearBackOffPolicy();
-                linearBackOffPolicy.setInitialInterval(retry.getInitialInterval().toMillis());
-                linearBackOffPolicy.setIncrement(retry.getIncrement().toMillis());
-                linearBackOffPolicy.setMaxInterval(retry.getMaxInterval().toMillis());
-                yield linearBackOffPolicy;
-            }
-            case EXPONENT -> {
-                ExponentialBackOffPolicy exponentialBackOffPolicy = new ExponentialBackOffPolicy();
-                exponentialBackOffPolicy.setInitialInterval(retry.getInitialInterval().toMillis());
-                exponentialBackOffPolicy.setMultiplier(retry.getMultiplier());
-                exponentialBackOffPolicy.setMaxInterval(retry.getMaxInterval().toMillis());
-                yield exponentialBackOffPolicy;
-            }
         };
-        RetryTemplate template = new RetryTemplate();
-        template.setRetryPolicy(retryPolicy);
-        template.setBackOffPolicy(backOffPolicy);
-        return template;
     }
 }

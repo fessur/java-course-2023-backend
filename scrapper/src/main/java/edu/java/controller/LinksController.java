@@ -1,6 +1,5 @@
 package edu.java.controller;
 
-import edu.java.controller.buckets.Limiter;
 import edu.java.controller.dto.AddLinkRequest;
 import edu.java.controller.dto.ApiErrorResponse;
 import edu.java.controller.dto.LinkResponse;
@@ -14,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -32,11 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Links", description = "API for working with links")
 public class LinksController extends BaseController {
     private final LinkService linkService;
-    private final Limiter limiter;
 
-    public LinksController(LinkService linkService, Limiter limiter) {
+    public LinksController(LinkService linkService) {
         this.linkService = linkService;
-        this.limiter = limiter;
     }
 
     @GetMapping
@@ -55,14 +51,10 @@ public class LinksController extends BaseController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
-    public ResponseEntity<?> getLinks(@RequestHeader("Tg-Chat-Id") long chatId, HttpServletRequest request) {
-        if (limiter.tryConsume(request.getRemoteAddr())) {
-            List<LinkResponse> links = linkService.listAll(chatId).stream().map(link -> new LinkResponse(
-                link.getId(), link.getUrl())).toList();
-            return ResponseEntity.ok().body(new ListLinksResponse(links, links.size()));
-        } else {
-            return createTooManyRequests();
-        }
+    public ResponseEntity<?> getLinks(@RequestHeader("Tg-Chat-Id") long chatId) {
+        List<LinkResponse> links = linkService.listAll(chatId).stream().map(link -> new LinkResponse(
+            link.getId(), link.getUrl())).toList();
+        return ResponseEntity.ok().body(new ListLinksResponse(links, links.size()));
     }
 
     @PostMapping
@@ -91,18 +83,13 @@ public class LinksController extends BaseController {
     public ResponseEntity<?> addLink(
         @RequestHeader("Tg-Chat-Id") long chatId,
         @Valid @RequestBody AddLinkRequest addLinkRequest,
-        BindingResult bindingResult,
-        HttpServletRequest request
+        BindingResult bindingResult
     ) {
-        if (limiter.tryConsume(request.getRemoteAddr())) {
-            if (bindingResult.hasErrors()) {
-                return createBadRequestResponse(bindingResult);
-            }
-            Link addedLink = linkService.add(addLinkRequest.link(), chatId);
-            return ResponseEntity.ok().body(new LinkResponse(addedLink.getId(), addedLink.getUrl()));
-        } else {
-            return createTooManyRequests();
+        if (bindingResult.hasErrors()) {
+            return createBadRequestResponse(bindingResult);
         }
+        Link addedLink = linkService.add(addLinkRequest.link(), chatId);
+        return ResponseEntity.ok().body(new LinkResponse(addedLink.getId(), addedLink.getUrl()));
     }
 
     @DeleteMapping
@@ -131,17 +118,12 @@ public class LinksController extends BaseController {
     public ResponseEntity<?> deleteLink(
         @RequestHeader("Tg-Chat-Id") long chatId,
         @Valid @RequestBody RemoveLinkRequest removeLinkRequest,
-        BindingResult bindingResult,
-        HttpServletRequest request
+        BindingResult bindingResult
     ) {
-        if (limiter.tryConsume(request.getRemoteAddr())) {
-            if (bindingResult.hasErrors()) {
-                return createBadRequestResponse(bindingResult);
-            }
-            Link deleted = linkService.remove(removeLinkRequest.link(), chatId);
-            return ResponseEntity.ok().body(new LinkResponse(deleted.getId(), deleted.getUrl()));
-        } else {
-            return createTooManyRequests();
+        if (bindingResult.hasErrors()) {
+            return createBadRequestResponse(bindingResult);
         }
+        Link deleted = linkService.remove(removeLinkRequest.link(), chatId);
+        return ResponseEntity.ok().body(new LinkResponse(deleted.getId(), deleted.getUrl()));
     }
 }

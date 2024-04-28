@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.implementation.GithubClientImpl;
-import edu.java.client.retry.RetryConfiguration;
 import edu.java.configuration.ApplicationConfig;
+import edu.java.client.retry.RetryConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -30,7 +30,7 @@ public class RetryTest {
     public void testRetryConstant() {
         GithubClient githubClient = new GithubClientImpl(
             BASE_URL,
-            retryConfiguration.githubRetryTemplate(createApplicationConfig(
+            retryConfiguration.githubRetrySpec(createApplicationConfig(
                 new RetryBuilder(6, new int[] {500}).constant(300)))
         );
 
@@ -41,7 +41,7 @@ public class RetryTest {
     public void testRetryLinear() {
         GithubClient githubClient = new GithubClientImpl(
             BASE_URL,
-            retryConfiguration.githubRetryTemplate(createApplicationConfig(
+            retryConfiguration.githubRetrySpec(createApplicationConfig(
                 new RetryBuilder(10, new int[] {500})
                     .linear(100, 100, 20000)))
         );
@@ -53,9 +53,9 @@ public class RetryTest {
     public void testRetryExponent() {
         GithubClient githubClient = new GithubClientImpl(
             BASE_URL,
-            retryConfiguration.githubRetryTemplate(createApplicationConfig(
+            retryConfiguration.githubRetrySpec(createApplicationConfig(
                 new RetryBuilder(6, new int[] {500})
-                    .exponent(100, 2, 20000)))
+                    .exponent(100, 20000)))
         );
 
         timed(3100, () -> request(githubClient));

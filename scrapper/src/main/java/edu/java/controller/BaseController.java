@@ -13,12 +13,4 @@ public abstract class BaseController {
                 Integer.toString(HttpStatus.BAD_REQUEST.value())
             ));
     }
-
-    protected ResponseEntity<ApiErrorResponse> createTooManyRequests() {
-        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-            .body(new ApiErrorResponse(
-                "Too many requests.",
-                Integer.toString(HttpStatus.TOO_MANY_REQUESTS.value())
-            ));
-    }
 }

@@ -58,8 +58,6 @@ public record ApplicationConfig(
         private Duration initialInterval; // also used for exponent
         private Duration increment;
         private Duration maxInterval; // also used for exponent
-        // Exponent
-        private Double multiplier;
     }
 
     public enum RetryPolicy {

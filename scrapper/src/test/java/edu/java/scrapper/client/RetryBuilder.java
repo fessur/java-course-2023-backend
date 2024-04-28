@@ -26,10 +26,9 @@ public class RetryBuilder {
         return retry;
     }
 
-    public ApplicationConfig.Retry exponent(long initialInterval, double multiplier, long maxInterval) {
+    public ApplicationConfig.Retry exponent(long initialInterval, long maxInterval) {
         retry.setPolicy(ApplicationConfig.RetryPolicy.EXPONENT  );
         retry.setInitialInterval(Duration.ofMillis(initialInterval));
-        retry.setMultiplier(multiplier);
         retry.setMaxInterval(Duration.ofMillis(maxInterval));
         return retry;
     }

@@ -4,16 +4,21 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.TrackerBotClient;
 import edu.java.client.exception.BadRequestException;
 import edu.java.client.implementation.TrackerBotClientImpl;
-import edu.java.client.retry.RetryConfiguration;
 import edu.java.configuration.ApplicationConfig;
+import edu.java.client.retry.RetryConfiguration;
 import edu.java.service.model.Link;
 import edu.java.service.model.jdbc.JdbcLink;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
 import java.util.List;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @WireMockTest(httpPort = 8083)
 public class TrackerBotClientTest {
@@ -26,7 +31,8 @@ public class TrackerBotClientTest {
     public void setUp() {
         trackerBotClient = new TrackerBotClientImpl(
             BASE_URL,
-            new RetryConfiguration().trackerBotRetryTemplate(createApplicationConfig()));
+            new RetryConfiguration().trackerBotRetrySpec(createApplicationConfig())
+        );
     }
 
     @Test
