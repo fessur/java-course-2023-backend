@@ -37,7 +37,7 @@ public class LinksCommandsBaseTest {
         "https://www.google.com/"
     );
 
-    protected static final String INVALID_LINK_MSG = "The link is not correct";
+    protected static final String INVALID_LINK_MSG = "The link is not correct.";
 
     protected static final String TOO_MANY_REQUESTS_MSG = "Too many requests.\nPlease, try again later.";
 
@@ -117,7 +117,7 @@ public class LinksCommandsBaseTest {
 
     private ApiErrorResponse createInvalidLinkResponse() {
         return new ApiErrorResponse(
-            "The link is not correct",
+            "The link is not correct.",
             "400"
         );
     }

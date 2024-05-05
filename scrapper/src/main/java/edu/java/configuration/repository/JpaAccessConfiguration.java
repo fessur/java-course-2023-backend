@@ -13,7 +13,6 @@ import edu.java.service.SiteService;
 import edu.java.service.jpa.JpaChatService;
 import edu.java.service.jpa.JpaLinkService;
 import edu.java.service.jpa.JpaLinkUpdaterService;
-import edu.java.service.site.Site;
 import edu.java.service.site.jpa.JpaGithub;
 import edu.java.service.site.jpa.JpaSite;
 import edu.java.service.site.jpa.JpaStackOverflow;
@@ -28,7 +27,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = "edu.java.repository.jpa")
 public class JpaAccessConfiguration {
     @Bean
-    public List<Site> sites(
+    public List<JpaSite> sites(
         GithubClient githubClient,
         StackOverflowClient stackOverflowClient,
         UpdatesGateway updatesGateway

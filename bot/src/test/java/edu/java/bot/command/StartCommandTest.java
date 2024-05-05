@@ -11,16 +11,14 @@ import edu.java.bot.service.command.StartCommand;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
 
 public class StartCommandTest extends LinksCommandsBaseTest {
     private StartCommand startCommand;
     private final static String WELCOME = "Hello! Welcome to our bot!";
     private final static String WELCOME_AGAIN =
-        "You are already working with our bot. Use /help to see a list of all possible commands";
+        "You are already working with our bot. Use /help to see a list of all possible commands.";
     private final static String DESCRIPTION = "Start working with the bot";
 
     @BeforeEach

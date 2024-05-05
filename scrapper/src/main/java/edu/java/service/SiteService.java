@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SiteService {
-    private final List<Site> sites;
+    private final List<? extends Site> sites;
 
-    public SiteService(List<Site> sites) {
+    public SiteService(List<? extends Site> sites) {
         this.sites = sites;
     }
 
@@ -22,12 +22,12 @@ public class SiteService {
             }
             return Optional.of(d.notExistsMessage());
         }).orElse(Optional.of(
-            "Site " + url.getHost() + " is not supported yet. List of all supported domains:\n"
+            "Domain " + url.getHost() + " is not supported yet. List of all supported domains:\n"
                 + CommonUtils.joinEnumerated(sites.stream().map(Site::toString).toList(), 1)));
     }
 
     public String normalizeLink(URL url) {
         return sites.stream().filter(d -> d.isValid(url)).findFirst().map(d -> d.normalize(url))
-            .orElseThrow(() -> new IllegalArgumentException("The domain is not supported"));
+            .orElseThrow(() -> new IllegalArgumentException("The domain is not supported."));
     }
 }

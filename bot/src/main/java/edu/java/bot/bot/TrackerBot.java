@@ -8,9 +8,11 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetMyCommands;
 import edu.java.bot.configuration.props.ApplicationConfig;
 import edu.java.bot.service.command.Command;
+import io.micrometer.core.instrument.Counter;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +20,16 @@ import org.springframework.stereotype.Component;
 @Profile("!test")
 public class TrackerBot extends TelegramBot {
     private final List<Command> commands;
+    private final Counter processedMessages;
 
-    public TrackerBot(ApplicationConfig applicationConfig, List<Command> commands) {
+    public TrackerBot(
+        ApplicationConfig applicationConfig,
+        List<Command> commands,
+        @Qualifier("processedMessages") Counter processedMessages
+    ) {
         super(applicationConfig.telegramToken());
         this.commands = commands;
+        this.processedMessages = processedMessages;
     }
 
     @PostConstruct
@@ -35,13 +43,14 @@ public class TrackerBot extends TelegramBot {
     }
 
     private void process(Update update) {
-        for (Command command : commands) {
-            if (command.supports(update)) {
-                execute(command.process(update));
-                return;
-            }
-        }
-        processUnrecognizedCommand(update);
+        commands.stream()
+            .filter(cmd -> cmd.supports(update))
+            .findAny()
+            .ifPresentOrElse(
+                cmd -> execute(cmd.process(update)),
+                () -> processUnrecognizedCommand(update)
+            );
+        processedMessages.increment();
     }
 
     private void processUnrecognizedCommand(Update update) {

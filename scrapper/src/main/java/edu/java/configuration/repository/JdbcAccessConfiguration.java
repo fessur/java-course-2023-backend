@@ -15,7 +15,6 @@ import edu.java.service.SiteService;
 import edu.java.service.jdbc.JdbcChatService;
 import edu.java.service.jdbc.JdbcLinkService;
 import edu.java.service.jdbc.JdbcLinkUpdaterService;
-import edu.java.service.site.Site;
 import edu.java.service.site.jdbc.JdbcGithub;
 import edu.java.service.site.jdbc.JdbcSite;
 import edu.java.service.site.jdbc.JdbcStackOverflow;
@@ -39,7 +38,7 @@ public class JdbcAccessConfiguration {
     }
 
     @Bean
-    public List<Site> sites(
+    public List<JdbcSite> sites(
         UpdatesGateway updatesGateway,
         GithubClient githubClient,
         StackOverflowClient stackOverflowClient,
