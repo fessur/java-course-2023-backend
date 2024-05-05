@@ -6,7 +6,7 @@ import org.springframework.test.context.DynamicPropertySource;
 
 public abstract class JpaBaseDatabaseTest extends BaseDatabaseTest {
     @DynamicPropertySource
-    static void databaseProperties(DynamicPropertyRegistry registry) {
+    public static void databaseProperties(DynamicPropertyRegistry registry) {
         registry.add("app.database-access-type", () -> "jpa");
     }
 }

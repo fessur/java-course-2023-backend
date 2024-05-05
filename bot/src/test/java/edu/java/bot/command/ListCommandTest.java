@@ -108,6 +108,14 @@ public class ListCommandTest extends LinksCommandsBaseTest {
     }
 
     @Test
+    public void testTooManyRequests() {
+        Update update = new UpdateMock().withChat().build();
+        setTooManyRequests(update.message().chat().id());
+        SendMessage sendMessage = listCommand.process(update);
+        TestUtils.checkMessage(sendMessage, TOO_MANY_REQUESTS_MSG);
+    }
+
+    @Test
     public void testSupports() {
         assertThat(listCommand.supports(new UpdateMock().withMessage("/list").build())).isTrue();
         assertThat(listCommand.supports(new UpdateMock().withMessage("/track " + LINKS.getFirst())

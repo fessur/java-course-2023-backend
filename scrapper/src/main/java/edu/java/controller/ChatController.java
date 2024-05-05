@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/tg-chat/{id}")
 @Tag(name = "Chats", description = "API for telegram chats")
-public class ChatController {
+public class ChatController extends BaseController {
     private final ChatService chatService;
 
     public ChatController(ChatService chatService) {
@@ -27,7 +28,7 @@ public class ChatController {
     @PostMapping
     @Operation(summary = "Register chat")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Chat successfully registered"),
+        @ApiResponse(responseCode = "200", description = "Chat successfully registered", content = @Content),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         }),
@@ -35,14 +36,15 @@ public class ChatController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
-    public void register(@PathVariable("id") long id) {
+    public ResponseEntity<?> register(@PathVariable("id") long id) {
         chatService.register(id);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     @Operation(summary = "Delete chat")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Chat successfully deleted"),
+        @ApiResponse(responseCode = "200", description = "Chat successfully deleted", content = @Content),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         }),
@@ -50,7 +52,8 @@ public class ChatController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
-    public void delete(@PathVariable("id") long id) {
+    public ResponseEntity<?> delete(@PathVariable("id") long id) {
         chatService.unregister(id);
+        return ResponseEntity.ok().build();
     }
 }

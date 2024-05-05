@@ -3,10 +3,31 @@ app:
     enable: true
     interval: 10s
     force-check-delay: 1m
-  base-url:
-    github: https://api.github.com
-    stackoverflow: https://api.stackexchange.com/2.3
-    tracker-bot: http://localhost:8090
+  clients:
+    github:
+      base-url: https://api.github.com
+      retry:
+        max-attempts: 5
+        status-codes: [ 500, 502, 503 ]
+        policy: CONSTANT
+        step: 0s
+    stack-overflow:
+      base-url: https://api.stackexchange.com/2.3
+      retry:
+        max-attempts: 5
+        status-codes: [ 500, 502, 503 ]
+        policy: CONSTANT
+        step: 0s
+    tracker-bot:
+      base-url: http://localhost:8090
+      retry:
+        max-attempts: 5
+        status-codes: [ 500, 502, 503 ]
+        policy: CONSTANT
+        step: 0s
+  rate-limit:
+    requests: 30
+    interval: 1m
   database-access-type: jpa
 
 spring:

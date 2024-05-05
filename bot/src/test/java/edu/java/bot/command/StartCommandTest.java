@@ -5,7 +5,6 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.TestUtils;
 import edu.java.bot.UpdateMock;
-import edu.java.bot.client.ScrapperClient;
 import edu.java.bot.client.dto.ApiErrorResponse;
 import edu.java.bot.client.exception.ConflictException;
 import edu.java.bot.service.command.StartCommand;
@@ -13,15 +12,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
-public class StartCommandTest {
-    @Mock
-    private ScrapperClient scrapperClient;
+public class StartCommandTest extends LinksCommandsBaseTest {
     private StartCommand startCommand;
     private final static String WELCOME = "Hello! Welcome to our bot!";
     private final static String WELCOME_AGAIN =
@@ -64,6 +59,14 @@ public class StartCommandTest {
         Update updateFrom2 = new UpdateMock().withChat().build();
         SendMessage sendMessage2 = startCommand.process(updateFrom2);
         TestUtils.checkMessage(sendMessage2, WELCOME);
+    }
+
+    @Test
+    public void testTooManyRequests() {
+       Update update = new UpdateMock().withChat().build();
+       setTooManyRequests(update.message().chat().id());
+       SendMessage sendMessage = startCommand.process(update);
+       TestUtils.checkMessage(sendMessage, TOO_MANY_REQUESTS_MSG);
     }
 
     @Test

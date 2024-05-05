@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/links")
 @Tag(name = "Links", description = "API for working with links")
-public class LinksController {
+public class LinksController extends BaseController {
     private final LinkService linkService;
 
     public LinksController(LinkService linkService) {
@@ -47,9 +46,12 @@ public class LinksController {
         }),
         @ApiResponse(responseCode = "404", description = "Chat not found", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
+        }),
+        @ApiResponse(responseCode = "429", description = "Too many requests", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
-    public ResponseEntity<ListLinksResponse> getLinks(@RequestHeader("Tg-Chat-Id") long chatId) {
+    public ResponseEntity<?> getLinks(@RequestHeader("Tg-Chat-Id") long chatId) {
         List<LinkResponse> links = linkService.listAll(chatId).stream().map(link -> new LinkResponse(
             link.getId(), link.getUrl())).toList();
         return ResponseEntity.ok().body(new ListLinksResponse(links, links.size()));
@@ -72,6 +74,9 @@ public class LinksController {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         }),
         @ApiResponse(responseCode = "409", description = "Link is already tracking", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
+        }),
+        @ApiResponse(responseCode = "429", description = "Too many requests", content = {
             @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
         })
     })
@@ -105,7 +110,10 @@ public class LinksController {
                      content = {
                          @Content(mediaType = "application/json",
                                   schema = @Schema(implementation = ApiErrorResponse.class))
-                     })
+                     }),
+        @ApiResponse(responseCode = "429", description = "Too many requests", content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = ApiErrorResponse.class))
+        })
     })
     public ResponseEntity<?> deleteLink(
         @RequestHeader("Tg-Chat-Id") long chatId,
@@ -117,13 +125,5 @@ public class LinksController {
         }
         Link deleted = linkService.remove(removeLinkRequest.link(), chatId);
         return ResponseEntity.ok().body(new LinkResponse(deleted.getId(), deleted.getUrl()));
-    }
-
-    private ResponseEntity<ApiErrorResponse> createBadRequestResponse(BindingResult bindingResult) {
-        return ResponseEntity.badRequest()
-            .body(new ApiErrorResponse(
-                bindingResult.getAllErrors().getFirst().getDefaultMessage(),
-                Integer.toString(HttpStatus.BAD_REQUEST.value())
-            ));
     }
 }

@@ -1,5 +1,10 @@
 app:
   scrapper-base-url: http://localhost:8080
+  retry:
+    max-attempts: 5
+    status-codes: [ 500, 502, 503 ]
+    policy: CONSTANT
+    step: 0s
 
 spring:
   application:

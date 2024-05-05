@@ -4,23 +4,35 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import edu.java.client.TrackerBotClient;
 import edu.java.client.exception.BadRequestException;
 import edu.java.client.implementation.TrackerBotClientImpl;
+import edu.java.configuration.ApplicationConfig;
+import edu.java.client.retry.RetryConfiguration;
 import edu.java.service.model.Link;
 import edu.java.service.model.jdbc.JdbcLink;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import java.time.OffsetDateTime;
 import java.util.List;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static com.github.tomakehurst.wiremock.client.WireMock.badRequest;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 @WireMockTest(httpPort = 8083)
 public class TrackerBotClientTest {
+
+    private static final String BASE_URL = "http://localhost:8083";
 
     private TrackerBotClient trackerBotClient;
 
     @BeforeEach
     public void setUp() {
-        trackerBotClient = new TrackerBotClientImpl("http://localhost:8083");
+        trackerBotClient = new TrackerBotClientImpl(
+            BASE_URL,
+            new RetryConfiguration().trackerBotRetrySpec(createApplicationConfig())
+        );
     }
 
     @Test
@@ -89,5 +101,14 @@ public class TrackerBotClientTest {
                   ]
             }
             """;
+    }
+
+    private ApplicationConfig createApplicationConfig() {
+        return new ApplicationConfig(null, new ApplicationConfig.Clients(null, null,
+            new ApplicationConfig.TrackerBot(
+                BASE_URL,
+                new RetryBuilder(1, new int[] {500}).constant(0)
+            )
+        ), null, null);
     }
 }

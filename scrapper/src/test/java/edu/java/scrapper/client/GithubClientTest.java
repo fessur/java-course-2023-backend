@@ -5,20 +5,31 @@ import edu.java.client.GithubClient;
 import edu.java.client.dto.GithubRepositoryRequest;
 import edu.java.client.dto.GithubRepositoryResponse;
 import edu.java.client.implementation.GithubClientImpl;
+import edu.java.configuration.ApplicationConfig;
+import edu.java.client.retry.RetryConfiguration;
+import java.time.OffsetDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.time.OffsetDateTime;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.forbidden;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.notFound;
+import static com.github.tomakehurst.wiremock.client.WireMock.ok;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @WireMockTest(httpPort = 8081)
 public class GithubClientTest {
+
+    private static final String BASE_URL = "http://localhost:8081";
 
     private GithubClient githubClient;
 
     @BeforeEach
     public void setUp() {
-        githubClient = new GithubClientImpl("http://localhost:8081");
+        githubClient = new GithubClientImpl(
+            BASE_URL,
+            new RetryConfiguration().githubRetrySpec(createApplicationConfig())
+        );
     }
 
     @Test
@@ -205,5 +216,14 @@ public class GithubClientTest {
                       "network_count": 51043,
                       "subscribers_count": 8334
                     }""")));
+    }
+
+    private ApplicationConfig createApplicationConfig() {
+        return new ApplicationConfig(null, new ApplicationConfig.Clients(
+            new ApplicationConfig.Github(
+                BASE_URL,
+                new RetryBuilder(1, new int[] {500}).constant(0)
+            ), null, null
+        ), null, null);
     }
 }

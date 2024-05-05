@@ -13,6 +13,7 @@ import edu.java.bot.client.dto.ListLinksResponse;
 import edu.java.bot.client.exception.BadRequestException;
 import edu.java.bot.client.exception.ConflictException;
 import edu.java.bot.client.exception.NotFoundException;
+import edu.java.bot.client.exception.TooManyRequestsException;
 import edu.java.bot.util.CommonUtils;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -37,6 +38,8 @@ public class LinksCommandsBaseTest {
     );
 
     protected static final String INVALID_LINK_MSG = "The link is not correct";
+
+    protected static final String TOO_MANY_REQUESTS_MSG = "Too many requests.\nPlease, try again later.";
 
     protected void setAllUntrackedResponse(long chatId) {
         lenient().when(scrapperClient.fetchLinks(chatId)).thenReturn(createFetchLinksResponse());
@@ -71,6 +74,17 @@ public class LinksCommandsBaseTest {
     protected void setNotTrackingYetResponse(long chatId, String link) {
         lenient().when(scrapperClient.untrackLink(chatId, link))
             .thenThrow(new NotFoundException(createNotTrackingYetResponse()));
+    }
+
+    protected void setTooManyRequests(long chatId) {
+        lenient().when(scrapperClient.fetchLinks(chatId))
+            .thenThrow(new TooManyRequestsException(createTooManyRequestsResponse()));
+        lenient().when(scrapperClient.trackLink(eq(chatId), anyString()))
+            .thenThrow(new TooManyRequestsException(createTooManyRequestsResponse()));
+        lenient().when(scrapperClient.untrackLink(eq(chatId), anyString()))
+            .thenThrow(new TooManyRequestsException(createTooManyRequestsResponse()));
+        lenient().doThrow(new TooManyRequestsException(createTooManyRequestsResponse()))
+            .when(scrapperClient).registerChat(chatId);
     }
 
     private ListLinksResponse createFetchLinksResponse(String... links) {
@@ -114,6 +128,16 @@ public class LinksCommandsBaseTest {
             "404",
             "NoSuchLinkException",
             "Cannot find link",
+            List.of()
+        );
+    }
+
+    private ApiErrorResponse createTooManyRequestsResponse() {
+        return new ApiErrorResponse(
+            "Too many requests.\nPlease, try again later",
+            "429",
+            "",
+            "",
             List.of()
         );
     }

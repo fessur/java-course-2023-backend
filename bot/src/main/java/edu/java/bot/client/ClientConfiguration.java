@@ -4,11 +4,12 @@ import edu.java.bot.client.implementation.ScrapperClientImpl;
 import edu.java.bot.configuration.ApplicationConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.util.retry.Retry;
 
 @Configuration
 public class ClientConfiguration {
     @Bean
-    public ScrapperClient scrapperClient(ApplicationConfig applicationConfig) {
-        return new ScrapperClientImpl(applicationConfig.scrapperBaseUrl());
+    public ScrapperClient scrapperClient(ApplicationConfig applicationConfig, Retry retrySpec) {
+        return new ScrapperClientImpl(applicationConfig.scrapperBaseUrl(), retrySpec);
     }
 }

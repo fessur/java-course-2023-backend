@@ -4,29 +4,31 @@ import edu.java.client.implementation.GithubClientImpl;
 import edu.java.client.implementation.StackOverflowClientImpl;
 import edu.java.client.implementation.TrackerBotClientImpl;
 import edu.java.configuration.ApplicationConfig;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.util.retry.Retry;
 
 @Configuration
 public class ClientConfiguration {
     @Bean
     public GithubClient githubClient(
-        ApplicationConfig applicationConfig
+        ApplicationConfig applicationConfig, @Qualifier("githubRetrySpec") Retry retrySpec
     ) {
-        return new GithubClientImpl(applicationConfig.baseUrl().github());
+        return new GithubClientImpl(applicationConfig.clients().github().baseUrl(), retrySpec);
     }
 
     @Bean
     public StackOverflowClient stackOverflowClient(
-        ApplicationConfig applicationConfig
+        ApplicationConfig applicationConfig, @Qualifier("stackOverflowRetrySpec") Retry retrySpec
     ) {
-        return new StackOverflowClientImpl(applicationConfig.baseUrl().stackoverflow());
+        return new StackOverflowClientImpl(applicationConfig.clients().stackOverflow().baseUrl(), retrySpec);
     }
 
     @Bean
     public TrackerBotClient trackerBotClient(
-        ApplicationConfig applicationConfig
+        ApplicationConfig applicationConfig, @Qualifier("trackerBotRetrySpec") Retry retrySpec
     ) {
-        return new TrackerBotClientImpl(applicationConfig.baseUrl().trackerBot());
+        return new TrackerBotClientImpl(applicationConfig.clients().trackerBot().baseUrl(), retrySpec);
     }
 }

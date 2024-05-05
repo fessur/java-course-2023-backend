@@ -92,6 +92,14 @@ public class TrackCommandTest extends LinksCommandsBaseTest {
     }
 
     @Test
+    public void testTooManyRequests() {
+        Update update = new UpdateMock().withChat().withMessage("/track " + LINKS.getFirst()).build();
+        setTooManyRequests(update.message().chat().id());
+        SendMessage sendMessage = trackCommand.process(update);
+        TestUtils.checkMessage(sendMessage, TOO_MANY_REQUESTS_MSG);
+    }
+
+    @Test
     public void testSupports() {
         assertThat(trackCommand.supports(new UpdateMock().withMessage("/track " + LINKS.getFirst())
             .build())).isTrue();

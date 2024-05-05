@@ -25,7 +25,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    public SendMessage process(Update update) {
+    protected SendMessage processUpdate(Update update) {
         return new SendMessage(
             update.message().chat().id(),
             "List of all possible commands:\n"
