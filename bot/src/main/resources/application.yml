@@ -6,6 +6,27 @@ app:
     policy: CONSTANT
     step: 0s
 
+kafka:
+  consumer:
+    bootstrapServers: localhost:29092
+    groupId: tracker-bot
+    autoOffsetReset: earliest
+    maxPollIntervalMs: 300_000
+    enableAutoCommit: false
+    concurrency: 1
+    backoff:
+      interval: 1s
+      max-attempts: 3
+  producer:
+    bootstrapServers: localhost:29092
+    clientId: scrapper
+    acksMode: all
+    deliveryTimeout: 60s
+    lingerMs: 2000
+    batchSize: 100_000
+    maxInFlightPerConnection: 5
+    enableIdempotence: true
+
 spring:
   application:
     name: bot

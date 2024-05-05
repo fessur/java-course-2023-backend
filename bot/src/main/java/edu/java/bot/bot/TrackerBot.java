@@ -6,14 +6,16 @@ import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetMyCommands;
-import edu.java.bot.configuration.ApplicationConfig;
+import edu.java.bot.configuration.props.ApplicationConfig;
 import edu.java.bot.service.command.Command;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!test")
 public class TrackerBot extends TelegramBot {
     private final List<Command> commands;
 

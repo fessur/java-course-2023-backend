@@ -1,7 +1,7 @@
-package edu.java.bot.controller;
+package edu.java.bot.gateway.controller;
 
-import edu.java.bot.controller.dto.ApiErrorResponse;
-import edu.java.bot.controller.dto.LinkUpdateRequest;
+import edu.java.bot.gateway.controller.dto.ApiErrorResponse;
+import edu.java.bot.gateway.dto.LinkUpdate;
 import edu.java.bot.service.BotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,7 +31,7 @@ public class UpdatesController {
     @PostMapping
     @Operation(summary = "Send update", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
         required = true, content = {
-            @Content(mediaType = "application/json", schema = @Schema(implementation = LinkUpdateRequest.class))
+            @Content(mediaType = "application/json", schema = @Schema(implementation = LinkUpdate.class))
         }
     ))
     @ApiResponses(value = {
@@ -41,7 +41,7 @@ public class UpdatesController {
         })
     })
     public ResponseEntity<?> sendUpdate(
-        @Valid @RequestBody LinkUpdateRequest request, BindingResult bindingResult) {
+        @Valid @RequestBody LinkUpdate linkUpdate, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()
                 .body(new ApiErrorResponse(
@@ -49,7 +49,7 @@ public class UpdatesController {
                     Integer.toString(HttpStatus.BAD_REQUEST.value())
                 ));
         }
-        botService.sendMessages(request.tgChatIds(), request.url(), request.description());
+        botService.sendMessages(linkUpdate.tgChatIds(), linkUpdate.url(), linkUpdate.description());
         return ResponseEntity.ok().build();
     }
 }

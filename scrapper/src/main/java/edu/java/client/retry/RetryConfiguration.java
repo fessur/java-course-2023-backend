@@ -1,6 +1,6 @@
 package edu.java.client.retry;
 
-import edu.java.configuration.ApplicationConfig;
+import edu.java.configuration.props.ApplicationConfig;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -24,12 +24,7 @@ public class RetryConfiguration {
         return createRetrySpec(applicationConfig.clients().stackOverflow().retry());
     }
 
-    @Bean
-    public Retry trackerBotRetrySpec(ApplicationConfig applicationConfig) {
-        return createRetrySpec(applicationConfig.clients().trackerBot().retry());
-    }
-
-    private Retry createRetrySpec(ApplicationConfig.Retry retryConfig) {
+    public Retry createRetrySpec(ApplicationConfig.Retry retryConfig) {
         Set<Integer> statusCodes = Arrays.stream(retryConfig.getStatusCodes())
             .boxed().collect(Collectors.toSet());
         Predicate<Throwable> filter =
@@ -54,7 +49,6 @@ public class RetryConfiguration {
                     retryConfig.getMaxInterval(),
                     (retryBackoffSpec, retrySignal) -> retrySignal.failure()
                 );
-
         };
     }
 }

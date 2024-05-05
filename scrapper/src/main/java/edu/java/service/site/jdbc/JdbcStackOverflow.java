@@ -1,7 +1,8 @@
 package edu.java.service.site.jdbc;
 
 import edu.java.client.StackOverflowClient;
-import edu.java.client.TrackerBotClient;
+import edu.java.gateway.UpdatesGateway;
+import edu.java.gateway.dto.LinkUpdate;
 import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.service.model.Chat;
 import edu.java.service.model.jdbc.JdbcLink;
@@ -10,16 +11,16 @@ import edu.java.util.CommonUtils;
 import java.net.URL;
 
 public class JdbcStackOverflow extends StackOverflow implements JdbcSite {
-    private final TrackerBotClient trackerBotClient;
+    private final UpdatesGateway updatesGateway;
     private final JdbcChatRepository chatRepository;
 
     public JdbcStackOverflow(
-        TrackerBotClient trackerBotClient,
+        UpdatesGateway updatesGateway,
         StackOverflowClient stackOverflowClient,
         JdbcChatRepository chatRepository
     ) {
         super(stackOverflowClient);
-        this.trackerBotClient = trackerBotClient;
+        this.updatesGateway = updatesGateway;
         this.chatRepository = chatRepository;
     }
 
@@ -30,11 +31,12 @@ public class JdbcStackOverflow extends StackOverflow implements JdbcSite {
             .ifPresent(stackOverflowResponse -> {
                 if (stackOverflowResponse.lastActivityDate()
                     .isAfter(link.getLastCheckTime())) {
-                    trackerBotClient.sendUpdate(
-                        link,
+                    updatesGateway.sendUpdate(new LinkUpdate(
+                        link.getId(),
+                        link.getUrl(),
                         createDescription(stackOverflowResponse),
                         chatRepository.findAllByLink(link.getId()).stream().map(Chat::getId).toList()
-                    );
+                    ));
                 }
             });
     }

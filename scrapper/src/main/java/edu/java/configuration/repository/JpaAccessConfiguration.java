@@ -1,8 +1,9 @@
-package edu.java.configuration;
+package edu.java.configuration.repository;
 
 import edu.java.client.GithubClient;
 import edu.java.client.StackOverflowClient;
-import edu.java.client.TrackerBotClient;
+import edu.java.configuration.props.ApplicationConfig;
+import edu.java.gateway.UpdatesGateway;
 import edu.java.repository.jpa.JpaChatRepository;
 import edu.java.repository.jpa.JpaLinkRepository;
 import edu.java.service.ChatService;
@@ -30,13 +31,14 @@ public class JpaAccessConfiguration {
     public List<Site> sites(
         GithubClient githubClient,
         StackOverflowClient stackOverflowClient,
-        TrackerBotClient trackerBotClient
+        UpdatesGateway updatesGateway
     ) {
         return List.of(
-            new JpaGithub(githubClient, trackerBotClient),
-            new JpaStackOverflow(stackOverflowClient, trackerBotClient)
+            new JpaGithub(githubClient, updatesGateway),
+            new JpaStackOverflow(stackOverflowClient, updatesGateway)
         );
     }
+
 
     @Bean
     public LinkService linkService(

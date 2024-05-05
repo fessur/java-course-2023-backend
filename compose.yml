@@ -28,8 +28,45 @@ services:
     networks:
       - backend
 
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.4.4
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/zookeeper/config/zookeeper_jaas.conf"
+    ports:
+      - "2181:2181"
+    volumes:
+      - ./docker/zookeeper_jaas_config.conf:/etc/zookeeper/config/zookeeper_jaas.conf
+    networks:
+      - backend
+
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka:7.4.4
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/kafka_config_jaas.conf"
+    volumes:
+      - ./docker/kafka_jaas_config.conf:/etc/kafka/kafka_config_jaas.conf
+      - kafka:/var/lib/kafka/data
+    networks:
+      - backend
+
 volumes:
   postgresql: { }
+  kafka: { }
 
 networks:
   backend: { }

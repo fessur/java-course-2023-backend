@@ -1,4 +1,4 @@
-package edu.java.configuration;
+package edu.java.configuration.props;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +24,9 @@ public record ApplicationConfig(
     RateLimit rateLimit,
 
     @NotNull
-    AccessType databaseAccessType
+    AccessType databaseAccessType,
+
+    boolean useQueue
 ) {
     public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
     }

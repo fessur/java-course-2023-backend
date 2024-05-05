@@ -1,7 +1,7 @@
 package edu.java.bot.client;
 
 
-import edu.java.bot.configuration.ApplicationConfig;
+import edu.java.bot.configuration.props.ApplicationConfig;
 import java.time.Duration;
 
 public class RetryBuilder {

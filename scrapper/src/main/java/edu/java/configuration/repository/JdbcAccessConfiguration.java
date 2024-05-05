@@ -1,8 +1,9 @@
-package edu.java.configuration;
+package edu.java.configuration.repository;
 
 import edu.java.client.GithubClient;
 import edu.java.client.StackOverflowClient;
-import edu.java.client.TrackerBotClient;
+import edu.java.configuration.props.ApplicationConfig;
+import edu.java.gateway.UpdatesGateway;
 import edu.java.repository.jdbc.JdbcChatRepository;
 import edu.java.repository.jdbc.JdbcLinkRepository;
 import edu.java.repository.jdbc.implementation.JdbcChatRepositoryImpl;
@@ -39,14 +40,14 @@ public class JdbcAccessConfiguration {
 
     @Bean
     public List<Site> sites(
-        TrackerBotClient trackerBotClient,
+        UpdatesGateway updatesGateway,
         GithubClient githubClient,
         StackOverflowClient stackOverflowClient,
         JdbcChatRepository chatRepository
     ) {
         return List.of(
-            new JdbcGithub(trackerBotClient, githubClient, chatRepository),
-            new JdbcStackOverflow(trackerBotClient, stackOverflowClient, chatRepository)
+            new JdbcGithub(updatesGateway, githubClient, chatRepository),
+            new JdbcStackOverflow(updatesGateway, stackOverflowClient, chatRepository)
         );
     }
 

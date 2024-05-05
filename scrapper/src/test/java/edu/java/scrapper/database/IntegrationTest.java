@@ -47,6 +47,7 @@ public abstract class IntegrationTest {
 
     @DynamicPropertySource
     static void jdbcProperties(DynamicPropertyRegistry registry) {
+        registry.add("app.scheduler.enable", () -> "false");
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);

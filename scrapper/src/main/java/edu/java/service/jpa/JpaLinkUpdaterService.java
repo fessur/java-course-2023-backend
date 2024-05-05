@@ -1,6 +1,6 @@
 package edu.java.service.jpa;
 
-import edu.java.configuration.ApplicationConfig;
+import edu.java.configuration.props.ApplicationConfig;
 import edu.java.repository.jpa.JpaLinkRepository;
 import edu.java.service.LinkUpdaterService;
 import edu.java.service.model.jpa.JpaLink;
